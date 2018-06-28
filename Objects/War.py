@@ -3,6 +3,7 @@ from .Base import Object,Rotatable,Owned
 from Lib import Img,Vector
 from .Machines.Base import Machine,FixedMachine
 from Game.Registry import add_recipe
+from Game.Research import add_recipesearch
 from Engine.Items import Placeable,MultiSlot,Slot
 from .Machines import MUI
 class Explosion(Object):
@@ -41,5 +42,5 @@ class Bomb(Object):
     @property
     def img(self):
         return self.imgs[4-self.t//20]
-add_recipe({"Iron":3,"Circuit":1,"Bomb":1},Placeable(Mine))
+add_recipesearch({"Iron":3,"Circuit":1,"Bomb":1},Placeable(Mine),[1],30)
 add_recipe({"Iron":2,"Coal":2},Placeable(Bomb))

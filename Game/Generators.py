@@ -52,5 +52,5 @@ class Earth(SurfaceGen):
                 o.gen_pos(area,pos)
             if not randint(0,500):
                 area.spawn_new(Special.ChaosCrystal,pos)
-            elif h>0.2 and randint(0,2):
+            elif h>0.2 and randint(0,1):
                 area.spawn_new(World.Tree,pos)

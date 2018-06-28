@@ -37,4 +37,4 @@ class SpawnBox(Box):
     @property
     def hardness(self):
         return 0
-Registry.add_recipe({"Steel":4,"Iron":4,"ChaosCrystal":1},Items.Placeable(StdBox))
+Registry.add_recipe({"Steel":4,"Wire":10,"ChaosCrystal":1},Items.Placeable(StdBox))

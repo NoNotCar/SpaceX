@@ -285,6 +285,7 @@ class SButton(Button):
         for n,c in enumerate(acs):
             system.last.add_element(Viewport(ass*offs[n],ss,system.u.players[n]),"centred")
         system.switch(Vector.right)
+        system.dj.switch("Main")
     def gen_offs(self,n):
         if n>2:
             return sum(([V(x/2,-0.5),V(x/2,0.5)] for x in range(-((n+1)//2)+1,(n+1)//2,2)),[])

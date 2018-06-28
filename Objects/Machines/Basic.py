@@ -2,6 +2,7 @@ from Lib import Img,Vector
 from .Base import Machine,SlotMachine,FixedMachine
 from Engine.Items import Placeable,fuels
 from Game.Registry import add_recipe,get_recipes
+from Game import Research
 from . import MUI
 V=Vector.VectorX
 class Furnace(SlotMachine):
@@ -19,6 +20,7 @@ class Furnace(SlotMachine):
     @property
     def img(self):
         return self.imgs[bool(self.processor.progress)]
+#TODO: team resets for autocrafter and lab
 class AutoCrafter(SlotMachine):
     imgs=Img.imgstripxf("Machines/AutoCrafter",16)
     processor=None
@@ -53,6 +55,23 @@ class Generator(FixedMachine):
     @property
     def img(self):
         return self.imgs[self.working]
+class Lab(FixedMachine):
+    imgs=Img.imgstripxf("Machines/Lab")
+    working=False
+    def __init__(self,c,p):
+        super().__init__(c,p)
+        self.lab=MUI.Lab(100,10,p.team)
+        self.gui=MUI.MUI("LAB",[self.lab,MUI.ElectroSlot(self)])
+    def update(self, pos, area, events):
+        lp=self.lab.progress
+        super().update(pos,area,events)
+        self.working=self.lab.progress!=lp
+    def input(self,d,i):
+        return self.lab.inputs.add(i)
+    @property
+    def img(self):
+        return self.imgs[self.working]
 add_recipe({"Stone":5},Placeable(Furnace))
 add_recipe({"Gear":3,"Steel":4,"Circuit":3},Placeable(AutoCrafter))
 add_recipe({"Furnace":1,"Wire":8},Placeable(Generator))
+add_recipe({"AutoCrafter":1,"SP1":5},Placeable(Lab))

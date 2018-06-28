@@ -1,7 +1,7 @@
 from .Player import Player
 from . import Area
 from Lib.Vector import VectorX as V
-from . import Generators,Boxes,Registry,Gamemodes
+from . import Generators,Boxes,Registry,Gamemodes,Research
 from Engine import Items
 from Objects import Transport,Special
 from Objects.Machines import Production,Basic
@@ -11,7 +11,7 @@ Registry.add_process_recipe("Smelting",("Iron",5),(Items.resources["Steel"],1),2
 Registry.add_recipe({"Steel":5},Items.resources["Girder"])
 Registry.add_recipe({"Iron":1,"Wire":2},Items.resources["Circuit"])
 Registry.add_recipe({"Copper":1},(Items.resources["Wire"],3))
-Registry.add_recipe({"ChaosCrystal":3,"Stone":10},(Items.resources["ChaosCrystal"],4))
+Research.add_recipesearch({"ChaosCrystal":3,"Stone":10},(Items.resources["ChaosCrystal"],4),[1],10)
 class Universe(object):
     gm=Gamemodes.Standard()
     def __init__(self,js,ssz):

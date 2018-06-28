@@ -147,7 +147,7 @@ class Slot(object):
         if self.item is None:
             return True
         if self.item.can_stack(item):
-            return q<=self.stack_size-q
+            return q<=self.stack_size-self.q
         return False
     def transfer(self,other):
         if self.q:

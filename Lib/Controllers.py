@@ -28,8 +28,8 @@ class Controller(object):
         return Vector.zero
     def switch(self):
         pass
-    def get_start(self,events):
-        return False
+    def get_start_select(self,events):
+        return False,False
 class TandemController(Controller):
     cnum=0
     tandem = True
@@ -111,11 +111,14 @@ class Keyboard1(Controller):
             if e.type==pygame.KEYDOWN and e.key in self.kconv.keys():
                 return self.kconv[e.key]
         return Vector.zero
-    def get_start(self,events):
+    def get_start_select(self,events):
         for e in events:
             if e.type==pygame.KEYDOWN:
                 if e.key==pygame.K_c:
-                    return True
+                    return True,False
+                elif e.key==pygame.K_t:
+                    return False,True
+        return False,False
 class UniJoyController(Controller):
     icon=1
     def __init__(self,n):
@@ -173,7 +176,8 @@ class UniJoyController(Controller):
         return Vector.zero
     def get_pressed(self):
         return (self.uj.get_b("A"),self.uj.get_b("B"))
-    def get_start(self,events):
+    def get_start_select(self,events):
         for e in events:
             if e.type==pygame.JOYBUTTONDOWN and e.joy==self.uj.jnum:
-                return self.uj.get_b("START")
+                return self.uj.get_b("START"),self.uj.get_b("SELECT")
+        return False,False

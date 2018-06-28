@@ -2,6 +2,7 @@ from .Base import Object,Rotatable
 from Lib import Img,Vector
 from .Machines.Base import Machine,FixedMachine
 from Game.Registry import add_recipe
+from Game.Research import add_recipesearch
 from Engine.Items import Placeable,MultiSlot,Slot
 from .Machines import MUI
 class Conveyor(Rotatable):
@@ -61,8 +62,8 @@ class Splitter(Machine):
                 return True
 class Storage(FixedMachine):
     imgs=[Img.imgx("Transport/Storage")]
-    def __init__(self,c):
-        super().__init__(c)
+    def __init__(self,c,p):
+        super().__init__(c,p)
         self.inv=MultiSlot([Slot() for _ in range(7)])
         self.gui=MUI.MUI("Storage",[MUI.Inventory(self.inv)])
     def input(self,d,i):
@@ -88,6 +89,6 @@ add_recipe({"Gear":1,"Iron":2},(Placeable(Conveyor),5))
 add_recipe({"Conveyor1":2,"Iron":4},Placeable(Crossover))
 add_recipe({"Conveyor1":2,"Iron":3,"Gear":1},Placeable(Splitter))
 add_recipe({"Log":5},Placeable(Storage))
-add_recipe({"Conveyor1":1,"Gear":3},Placeable(Conveyor2))
-add_recipe({"Brick":5,"ChaosCrystal":1},Placeable(Tunnel))
+add_recipesearch({"Conveyor1":1,"Gear":3},Placeable(Conveyor2),[1],40)
+add_recipesearch({"Brick":5,"ChaosCrystal":1},Placeable(Tunnel),[1],20)
 add_recipe({"Conveyor1":1,"Iron":3},Placeable(Input))

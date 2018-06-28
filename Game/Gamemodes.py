@@ -24,12 +24,9 @@ class Gamemode(object):
         inv.add(Items.Placeable(Basic.Furnace))
         inv.add(Items.Placeable(Production.Miner))
         inv.add(Items.Placeable(Vehicles.Boat))
-        inv.add(Items.Placeable(Basic.Generator))
-        inv.add(Items.Placeable(Basic.AutoCrafter))
-        inv.add(Items.Placeable(Boxes.StdBox),3)
 class Standard(Gamemode):
     def setup(self,area,ps):
-        starting_area(area,V(0,-40),ps[::2])
-        starting_area(area,V(0,40),ps[1::2])
+        starting_area(area,V(-30,0),ps[::2])
+        starting_area(area,V(30,0),ps[1::2])
         for n,p in enumerate(ps):
             p.team=n%2

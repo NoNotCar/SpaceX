@@ -1,5 +1,5 @@
 from Lib import Vector,Img
-from Game import Registry
+from Game import Registry,Research
 from Engine import Items
 from collections import Counter
 from pygame import draw,Rect
@@ -145,6 +145,34 @@ class RSelect(Element):
         if self.sel_r:
             machine.gui_trigger(*self.sel_r)
             self.sel_r=None
+class TSelect(Element):
+    def __init__(self,team):
+        self.team=team
+    def get_h(self,w):
+        return len(Research.current[self.team]) // w + 1
+    def render(self,screen,y,size,rcpos=None):
+        if Research.current[self.team]:
+            for x,r in enumerate(Research.current[self.team]):
+                if r is Research.current_research[self.team]:
+                    draw.rect(screen,(100,100,100),Rect(x%size.x*64,y+x//size.x*64,64,64))
+                screen.blit(r.img[3],(x%size.x*64,y+x//size.x*64))
+            if rcpos is not None:
+                screen.blit(sel[3],rcpos*64+Vector.VectorX(0,y))
+                selr=Research.current[self.team][rcpos.x + rcpos.y * size.x]
+                l=len(selr.packs)
+                offset=(size.x-l)*32
+                for x,p in enumerate(selr.packs):
+                    Img.draw_with_num(screen,Items.get_item_image("SP%s"%p),selr.n,(offset+x*64,(size.y-1)*64),4)
+        else:
+            Img.bcentrex(tfont,"NO RESEARCH AVAILABLE",screen,y-16)
+    def inside(self,rpos,w):
+        return rpos.x<w and rpos.x+rpos.y*w<len(Research.current[self.team])
+    def on_a(self,rpos,w,p):
+        if Research.current[self.team]:
+            lr=Research.current_research[self.team]
+            Research.current_research[self.team] = Research.current[self.team][rpos.x + rpos.y * w]
+            if lr!=Research.current_research[self.team]:
+                Research.rprogs[self.team]=0
 class FuelSlot(Element):
     colour=(240,200,100)
     fleft=0
@@ -152,7 +180,7 @@ class FuelSlot(Element):
     def __init__(self,max_output=None):
         self.slot=Items.Slot()
         self.slot.backcol=self.colour
-        self.max_output=max_output/60
+        self.max_output=None if max_output is None else max_output/60
     def render(self,screen,y,size,rcpos=None):
         self.slot.render(screen,(0,y),3)
         if rcpos is not None:
@@ -285,6 +313,54 @@ class Crafter(Element):
                         self.inputs.remove(i,n)
                         self.progress += gp
                         break
+class Lab(Element):
+    progress=0
+    pcol=(200,200,255)
+    backcol=(0,0,0)
+    overlay=Img.imgx("SCIENCE")
+    def __init__(self,energy,power,team):
+        self.inputs=Items.MultiSlot([Items.FilterSlot(Items.resources["SP%s" % n]) for n in range(1,7)])
+        self.energy=energy
+        self.power=power/60
+        self.team=team
+    def inside(self,rpos,w):
+        return rpos.x<len(self.inputs.slots) and not rpos.y
+    def get_h(self,w):
+        return 2
+    def render(self,screen,y,size,rcpos=None):
+        for n,s in enumerate(self.inputs.slots):
+            s.render(screen,(n*64,y),3)
+            if rcpos is not None and n==rcpos.x:
+                screen.blit(sel[3], (n*64,y))
+        if Research.current_research[self.team]:
+            screen.blit(Research.current_research[self.team].img[3],((n+1)*64,y))
+        draw.rect(screen, self.backcol, Rect(0, y + 64, len(self.inputs.slots)*64, 32))
+        if self.progress:
+            draw.rect(screen, self.pcol, Rect(0, y + 64, len(self.inputs.slots)*64*self.progress/self.energy, 32))
+        screen.blit(self.overlay[3],(0,y+64))
+    def on_a(self,rpos,w,p):
+        self.inputs.slots[rpos.x].transfer(p.inv)
+    def on_drop(self,rpos,w,slot):
+        slot.transfer(self.inputs.slots[rpos.x])
+    def machine_update(self,ui,machine):
+        cr=Research.current_research[self.team]
+        if cr:
+            if self.progress:
+                if self.progress==self.energy:
+                    Research.rprogs[self.team]+=1
+                    if Research.rprogs[self.team]==cr.n:
+                        Research.on_complete(self.team)
+                    self.progress=0
+                else:
+                    self.progress+=ui.get_power(min(self.power,self.energy-self.progress))
+            else:
+                if all(self.inputs.slots[n-1] for n in cr.packs):
+                    gp=ui.get_power(self.power)
+                    if gp:
+                        for n in cr.packs:
+                            self.inputs.slots[n-1].remove(1)
+                            self.progress += gp
+                            break
 class Button(Element):
     selcol=(255,0,0)
     triggered=False

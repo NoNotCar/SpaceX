@@ -1,7 +1,7 @@
 from .Items import Item
 from Lib import Img
 import pygame
-from Game import Registry
+from Game import Registry,Research
 error=Img.sndget("error")
 bsnd=Img.sndget("break")
 class Pickaxe(Item):
@@ -45,6 +45,14 @@ class Bridger(Item):
         if t and not t.support:
             area.set_tile("Bridge",tpos)
             return True
+class ChainSaw(Item):
+    img=Img.imgx("Tools/ChainSaw")
+    stack_size = 1
+    def use(self,area,tpos,tr,p):
+        tree=area.get("Objects",tpos)
+        if tree and tree.name=="Tree" and p.inv.add(tree.mined()):
+            area.dobj(tree,tpos)
 Registry.add_recipe({"Iron":3,"Brick":5},Bridger())
+Research.add_recipesearch({"Circuit":5,"Steel":3},ChainSaw(),[1],20)
 
 

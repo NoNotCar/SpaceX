@@ -23,13 +23,17 @@ class Player(Object):
     def update(self, pos, area, events):
         self.ss+=self.j.get_lr(events)
         self.ss%=7
+        ss=self.j.get_start_select(events)
         if self.gui:
             self.gui.update(self,events)
-            if self.j.get_buttons(events)[1] or self.j.get_start(events):
+            if self.j.get_buttons(events)[1] or any(self.j.get_start_select(events)):
                 self.gui=None
             return
-        elif self.j.get_start(events):
+        elif ss[0]:
             self.enter_gui(MUI.MUI("CRAFTING",[MUI.HandCrafting(self)]))
+            return
+        elif ss[1]:
+            self.enter_gui(MUI.MUI("RESEARCH", [MUI.TSelect(self.team)]))
             return
         buttons = self.j.get_buttons(events)
         pressed=self.j.get_pressed()
