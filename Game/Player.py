@@ -20,7 +20,6 @@ class Player(Object):
         self.col=j.col
         self.j=j
         self.inv=Items.MultiSlot([Items.Slot() for _ in range(7)])
-        self.craftingui=MUI.MUI("CRAFTING",[MUI.HandCrafting()])
     def update(self, pos, area, events):
         self.ss+=self.j.get_lr(events)
         self.ss%=7
@@ -30,7 +29,7 @@ class Player(Object):
                 self.gui=None
             return
         elif self.j.get_start(events):
-            self.enter_gui(self.craftingui)
+            self.enter_gui(MUI.MUI("CRAFTING",[MUI.HandCrafting(self)]))
             return
         buttons = self.j.get_buttons(events)
         pressed=self.j.get_pressed()

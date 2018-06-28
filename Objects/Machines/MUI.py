@@ -82,14 +82,16 @@ class Element(object):
         return 0
 class HandCrafting(Element):
     make=Img.sndget("make")
+    def __init__(self,p):
+        self.rs=Registry.get_recipes(p.team,"Crafting")
     def get_h(self,w):
-        return len(Registry.recipes) // w + 1
+        return len(self.rs) // w + 1
     def render(self,screen,y,size,rcpos=None):
-        for x,(i,(p,q)) in enumerate(Registry.recipes):
+        for x,(i,(p,q)) in enumerate(self.rs):
             Img.draw_with_num(screen,p.img,q,(x%size.x*64,y+x//size.x*64),4)
         if rcpos is not None:
             screen.blit(sel[3],rcpos*64+Vector.VectorX(0,y))
-            selr=Registry.recipes[rcpos.x + rcpos.y * size.x]
+            selr=self.rs[rcpos.x + rcpos.y * size.x]
             i,(p,q)=selr
             l=len(i)
             offset=(size.x-l-2)*32
@@ -98,9 +100,9 @@ class HandCrafting(Element):
             screen.blit(arrow[3],(offset+l*64,(size.y-1)*64))
             Img.draw_with_num(screen, p.img, q, (offset + (l+1) * 64, (size.y - 1) * 64), 4)
     def inside(self,rpos,w):
-        return rpos.x<w and rpos.x+rpos.y*w<len(Registry.recipes)
+        return rpos.x<w and rpos.x+rpos.y*w<len(self.rs)
     def on_a(self,rpos,w,p):
-        i,(prd,q) = Registry.recipes[rpos.x + rpos.y * w]
+        i,(prd,q) = self.rs[rpos.x + rpos.y * w]
         psc=p.inv.get_counter()
         ic=Counter(i)
         if ic&psc==ic:
@@ -118,7 +120,7 @@ class HandCrafting(Element):
         error.play()
 class RSelect(Element):
     sel_r=None
-    def __init__(self,rs=Registry.recipes):
+    def __init__(self,rs):
         self.rs=rs
     def get_h(self,w):
         return len(self.rs) // w + 1

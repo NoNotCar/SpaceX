@@ -53,7 +53,9 @@ class Placeable(Item):
                 return False
         if not area.supported(self.pc,tpos):
             return False
-        if self.pc.rotates:
+        if self.pc.rotates and self.pc.owned:
+            area.spawn_new(self.pc,tpos,tr,p)
+        elif self.pc.rotates:
             area.spawn_new(self.pc,tpos,tr)
         elif self.pc.owned:
             area.spawn_new(self.pc, tpos, p)

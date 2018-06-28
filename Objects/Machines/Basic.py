@@ -1,13 +1,13 @@
 from Lib import Img,Vector
 from .Base import Machine,SlotMachine,FixedMachine
 from Engine.Items import Placeable,fuels
-from Game.Registry import add_recipe
+from Game.Registry import add_recipe,get_recipes
 from . import MUI
 V=Vector.VectorX
 class Furnace(SlotMachine):
     imgs=Img.imgstripxf("Machines/Furnace",16)
-    def __init__(self,c,r):
-        super().__init__(c,r)
+    def __init__(self,c,r,p):
+        super().__init__(c,r,p)
         self.processor=MUI.Processor("Smelting",10)
         self.fuel=MUI.FuelSlot()
         self.gui=MUI.MUI("Furnace",[self.processor,self.fuel])
@@ -22,13 +22,13 @@ class Furnace(SlotMachine):
 class AutoCrafter(SlotMachine):
     imgs=Img.imgstripxf("Machines/AutoCrafter",16)
     processor=None
-    def __init__(self,c,r):
-        super().__init__(c,r)
+    def __init__(self,c,r,p):
+        super().__init__(c,r,p)
         self.electro=MUI.ElectroSlot(self)
-        self.gui=MUI.MUI("Select Recipe", [MUI.RSelect()])
+        self.gui=MUI.MUI("Select Recipe", [MUI.RSelect(get_recipes(self.p.team,"Crafting"))])
     def gui_trigger(self,*args):
         if args[0]=="Change Recipe" and not (self.processor and any(self.processor.inputs.slots)):
-            self.gui.re_init("Select Recipe", [MUI.RSelect()])
+            self.gui.re_init("Select Recipe", [MUI.RSelect(get_recipes(self.p.team,"Crafting"))])
             self.processor = None
         else:
             self.processor=MUI.Crafter(args,sum(q for q in args[0].values())*10,10)
@@ -42,8 +42,8 @@ class AutoCrafter(SlotMachine):
 class Generator(FixedMachine):
     imgs=Img.imgstripxf("Machines/Generator")
     working=False
-    def __init__(self,c):
-        super().__init__(c)
+    def __init__(self,c,p):
+        super().__init__(c,p)
         self.fuel=MUI.FuelSlot(20)
         self.gui=MUI.MUI("Generator",[self.fuel])
     def update(self, pos, area, events):

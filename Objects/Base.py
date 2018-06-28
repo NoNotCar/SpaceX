@@ -79,3 +79,8 @@ class Owned(Object):
     def __init__(self,coords,p):
         self.p=p
         super().__init__(coords)
+class Rotowned(Rotatable):
+    owned = True
+    def __init__(self,c,r,p):
+        self.p=p
+        super().__init__(c,r)

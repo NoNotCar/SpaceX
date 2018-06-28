@@ -1,14 +1,14 @@
-from ..Base import Object,Rotatable
+from ..Base import Object,Rotatable,Rotowned
 from Lib import Vector,Img
 from Engine import Items
-class Machine(Rotatable):
+class Machine(Rotowned):
     gui=None
     layers = ["Conv","Items","Objects"]
     renderlayer = "Objects"
     hardness = 30
     slayer = "Tiles"
-    def __init__(self,c,r):
-        super().__init__(c,r)
+    def __init__(self,c,r,p):
+        super().__init__(c,r,p)
         self.output={v:None for v in Vector.vdirs}
     def update(self, pos, area, events):
         if self.gui:
@@ -32,8 +32,8 @@ class Machine(Rotatable):
             player.enter_gui(self.gui)
 class FixedMachine(Machine):
     rotates = False
-    def __init__(self,coords):
-        super().__init__(coords,0)
+    def __init__(self,coords,p):
+        super().__init__(coords,0,p)
 class SlotMachine(Machine):
     outputslot=None
     output_enabled=False
