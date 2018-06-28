@@ -1,0 +1,326 @@
+from Lib import Vector,Img
+from Game import Registry
+from Engine import Items
+from collections import Counter
+from pygame import draw,Rect
+tfont= Img.fload("cool", 64)
+sel=Img.imgx("GUISelect")
+arrow=Img.imgx("Arrow")
+error=Img.sndget("error")
+class MUI(object):
+    bcol=(210,)*3
+    size=Vector.zero
+    def __init__(self,title,elements):
+        self.re_init(title,elements)
+        self.cdict={}
+    def re_init(self,title,elements):
+        self.title = title
+        self.es = elements
+    def on_enter(self,j,sz):
+        self.size=sz
+        self.cdict[j]=Vector.zero
+    def render(self,screen,srcj):
+        screen.fill(self.bcol)
+        Img.bcentrex(tfont,self.title,screen,48)
+        y=0
+        cc=self.cdict[srcj]
+        for e in self.es:
+            h=e.get_h(self.size.x)
+            e.render(screen,y*64+128,self.size,cc-Vector.VectorX(0,y) if y<=cc.y<y+h else None)
+            y+=h
+    def update(self,p,events):
+        j=p.j
+        self.cdict[j]+=j.get_dir_pressed(events)
+        cpos=self.cdict[j]
+        if cpos.x<0:
+            cpos+=Vector.up
+        e,y=self.current_element(j)
+        if e is None or not e.inside(cpos-Vector.VectorX(0,y),self.size.x):
+            self.cdict[j]=Vector.VectorX(0,cpos.y+1)
+        if cpos.y<0 or cpos.y>=sum(e.get_h(self.size.x) for e in self.es):
+            self.cdict[j]=Vector.zero
+        buttons=j.get_buttons(events)
+        e, y = self.current_element(j)
+        cpos = self.cdict[j]
+        if buttons[0]:
+            e.on_a(cpos-Vector.VectorX(0,y),self.size.x,p)
+        elif buttons[3]:
+            e.on_drop(cpos - Vector.VectorX(0, y),self.size.x, p.cslot)
+    def current_element(self,j):
+        cpos=self.cdict[j]
+        y=0
+        for e in self.es:
+            h = e.get_h(self.size.x)
+            if cpos.y<y+h:
+                return e,y
+            y+=h
+        return None,None
+    def mupdate(self,machine):
+        for e in self.es:
+            e.machine_update(self,machine)
+    def get_power(self,needed):
+        need=needed
+        for e in self.es:
+            needed-=e.get_power(needed)
+            if not needed:
+                break
+        return need-needed
+class Element(object):
+    def get_h(self,w):
+        return 1
+    def render(self,screen,y,size,rcpos=None):
+        pass
+    def inside(self,rpos,w):
+        return True
+    def on_a(self,rpos,w,p):
+        pass
+    def on_drop(self,rpos,w,slot):
+        pass
+    def machine_update(self,ui,machine):
+        pass
+    def get_power(self,needed):
+        return 0
+class HandCrafting(Element):
+    make=Img.sndget("make")
+    def get_h(self,w):
+        return len(Registry.recipes) // w + 1
+    def render(self,screen,y,size,rcpos=None):
+        for x,(i,(p,q)) in enumerate(Registry.recipes):
+            Img.draw_with_num(screen,p.img,q,(x%size.x*64,y+x//size.x*64),4)
+        if rcpos is not None:
+            screen.blit(sel[3],rcpos*64+Vector.VectorX(0,y))
+            selr=Registry.recipes[rcpos.x + rcpos.y * size.x]
+            i,(p,q)=selr
+            l=len(i)
+            offset=(size.x-l-2)*32
+            for x,(item,n) in enumerate(i.items()):
+                Img.draw_with_num(screen,Items.get_item_image(item),n,(offset+x*64,(size.y-1)*64),4)
+            screen.blit(arrow[3],(offset+l*64,(size.y-1)*64))
+            Img.draw_with_num(screen, p.img, q, (offset + (l+1) * 64, (size.y - 1) * 64), 4)
+    def inside(self,rpos,w):
+        return rpos.x<w and rpos.x+rpos.y*w<len(Registry.recipes)
+    def on_a(self,rpos,w,p):
+        i,(prd,q) = Registry.recipes[rpos.x + rpos.y * w]
+        psc=p.inv.get_counter()
+        ic=Counter(i)
+        if ic&psc==ic:
+            taken=Counter()
+            for item,n in i.items():
+                taken+=p.inv.remove(item,n)
+            added=p.inv.add(prd,q)
+            if added!=q:
+                p.inv.remove(prd.name,added)
+                for item, n in taken.items():
+                    p.inv.add(item,n)
+            else:
+                self.make.play()
+                return
+        error.play()
+class RSelect(Element):
+    sel_r=None
+    def __init__(self,rs=Registry.recipes):
+        self.rs=rs
+    def get_h(self,w):
+        return len(self.rs) // w + 1
+    def render(self,screen,y,size,rcpos=None):
+        for x,(i,(p,q)) in enumerate(self.rs):
+            Img.draw_with_num(screen,p.img,q,(x%size.x*64,y+x//size.x*64),4)
+        if rcpos is not None:
+            screen.blit(sel[3],rcpos*64+Vector.VectorX(0,y))
+            selr=self.rs[rcpos.x + rcpos.y * size.x]
+            i,(p,q)=selr
+            l=len(i)
+            offset=(size.x-l-2)*32
+            for x,(item,n) in enumerate(i.items()):
+                Img.draw_with_num(screen,Items.get_item_image(item),n,(offset+x*64,(size.y-1)*64),4)
+            screen.blit(arrow[3],(offset+l*64,(size.y-1)*64))
+            Img.draw_with_num(screen, p.img, q, (offset + (l+1) * 64, (size.y - 1) * 64), 4)
+    def inside(self,rpos,w):
+        return rpos.x<w and rpos.x+rpos.y*w<len(self.rs)
+    def on_a(self,rpos,w,p):
+        self.sel_r = self.rs[rpos.x + rpos.y * w]
+    def machine_update(self,ui,machine):
+        if self.sel_r:
+            machine.gui_trigger(*self.sel_r)
+            self.sel_r=None
+class FuelSlot(Element):
+    colour=(240,200,100)
+    fleft=0
+    max_f=0
+    def __init__(self,max_output=None):
+        self.slot=Items.Slot()
+        self.slot.backcol=self.colour
+        self.max_output=max_output/60
+    def render(self,screen,y,size,rcpos=None):
+        self.slot.render(screen,(0,y),3)
+        if rcpos is not None:
+            screen.blit(sel[3], (0,y))
+        if self.fleft:
+            draw.rect(screen,self.colour,Rect(64,y+16,(size.x*64-64)*self.fleft/self.max_f,32))
+    def on_a(self,rpos,w,p):
+        if self.slot.item:
+            self.slot.remove(p.inv.add(self.slot.item,self.slot.q))
+    def on_drop(self,rpos,w,slot):
+        if slot.item and slot.item.name in Items.fuels:
+            slot.transfer(self.slot)
+    def get_power(self,needed):
+        needed=self.max_output if self.max_output and self.max_output<needed else needed
+        need=needed
+        while needed:
+            if self.fleft:
+                trans=min(self.fleft,needed)
+                self.fleft-=trans
+                needed-=trans
+            elif self.slot and self.slot.item.name in Items.fuels:
+                self.fleft+=Items.fuels[self.slot.item.name]
+                self.max_f=self.fleft
+                self.slot.remove(1)
+            else:
+                break
+        return need-needed
+class ElectroSlot(Element):
+    colour = (255, 216, 0)
+    nullcolour=(100,100,100)
+    electro=Img.imgx("Electro")
+    last_power=0
+    last_need=0
+    def __init__(self,mach):
+        self.mach=mach
+    def render(self, screen, y, size, rcpos=None):
+        screen.blit(self.electro[3],(0,y))
+        if rcpos is not None:
+            screen.blit(sel[3], (0, y))
+        draw.rect(screen, self.nullcolour, Rect(64, y + 16, (size.x * 64 - 64), 32))
+        area=self.mach.coords.area
+        if not area.infinite and area.ebuffer:
+            draw.rect(screen, self.colour, Rect(64, y + 16, (size.x * 64 - 64) * area.ebuffer / area.emax, 32))
+    def get_power(self, needed):
+        self.last_need=needed
+        self.last_power=self.mach.coords.area.get_power(needed)
+        return self.last_power
+class Processor(Element):
+    progress=0
+    cr=None
+    pcol=(255,0,0)
+    def __init__(self,recipe,power):
+        self.input=Items.Slot()
+        self.output=Items.Slot()
+        self.recipe=recipe
+        self.power=power/60
+    def inside(self,rpos,w):
+        return rpos.x<2
+    def render(self,screen,y,size,rcpos=None):
+        for n,s in enumerate((self.input,self.output)):
+            s.render(screen,(size.x*64-64 if n else 0,y),3)
+            if rcpos is not None and n==rcpos.x:
+                screen.blit(sel[3], (size.x*64-64 if n else 0,y))
+        draw.rect(screen,self.input.backcol,Rect(64,y+16,size.x*64-128,32))
+        if self.progress:
+            draw.rect(screen, self.pcol, Rect(64, y + 16, (size.x * 64 - 128)*self.progress/self.cr[2], 32))
+    def on_a(self,rpos,w,p):
+        (self.input,self.output)[rpos.x].transfer(p.inv)
+    def on_drop(self,rpos,w,slot):
+        slot.transfer((self.input,self.output)[rpos.x])
+    def machine_update(self,ui,machine):
+        if self.cr:
+            if self.progress==self.cr[2]:
+                if self.output.can_add(*self.cr[1]):
+                    self.output.add(*self.cr[1])
+                    self.cr=None
+                    self.progress=0
+            else:
+                self.progress+=ui.get_power(min(self.power,self.cr[2]-self.progress))
+        elif self.input.q:
+            for r in Registry.processing_recipes[self.recipe]:
+                if r[0][0]==self.input.item.name and r[0][1]<=self.input.q:
+                    gp = ui.get_power(self.power)
+                    if gp:
+                        self.input.remove(r[0][1])
+                        self.cr=r
+                        self.progress+=gp
+                        break
+class Crafter(Element):
+    progress=0
+    pcol=(255,0,0)
+    def __init__(self,recipe,energy,power):
+        self.inputs=Items.MultiSlot([Items.FilterSlot(Items.get_item(k),v) for k,v in recipe[0].items()])
+        self.output=Items.FilterSlot(recipe[1][0])
+        self.recipe=recipe
+        self.energy=energy
+        self.power=power/60
+        self.tar_inputs=Counter(self.recipe[0])
+    def inside(self,rpos,w):
+        return rpos.x<len(self.inputs.slots)+1
+    def render(self,screen,y,size,rcpos=None):
+        for n,s in enumerate(self.inputs.slots):
+            s.render(screen,(n*64,y),3)
+            if rcpos is not None and n==rcpos.x:
+                screen.blit(sel[3], (n*64,y))
+        self.output.render(screen,(size.x*64-64,y),3)
+        islots = len(self.inputs.slots)
+        if rcpos and rcpos.x==islots:
+            screen.blit(sel[3], (size.x*64-64,y))
+        draw.rect(screen, self.inputs.slots[0].backcol, Rect(64 * islots, y + 16, (size.x-islots-1)*64, 32))
+        if self.progress:
+            draw.rect(screen, self.pcol, Rect(64 * islots, y + 16, (size.x-islots-1)*64*self.progress/self.energy, 32))
+    def on_a(self,rpos,w,p):
+        (self.inputs.slots+[self.output])[rpos.x].transfer(p.inv)
+    def on_drop(self,rpos,w,slot):
+        slot.transfer((self.inputs.slots+[self.output])[rpos.x])
+    def machine_update(self,ui,machine):
+        if self.progress:
+            if self.progress==self.energy:
+                if self.output.can_add(*self.recipe[1]):
+                    self.output.add(*self.recipe[1])
+                    self.progress=0
+            else:
+                self.progress+=ui.get_power(min(self.power,self.energy-self.progress))
+        else:
+            if self.tar_inputs&self.inputs.get_counter()==self.tar_inputs:
+                gp=ui.get_power(self.power)
+                if gp:
+                    for i,n in self.recipe[0].items():
+                        self.inputs.remove(i,n)
+                        self.progress += gp
+                        break
+class Button(Element):
+    selcol=(255,0,0)
+    triggered=False
+    def __init__(self,text):
+        self.text=text
+    def inside(self,rpos,w):
+        return rpos.x==0
+    def render(self,screen,y,size,rcpos=None):
+        Img.bcentrex(tfont,self.text,screen,y-16,col=(0,0,0) if rcpos is None else self.selcol)
+    def on_a(self,rpos,w,p):
+        self.triggered=True
+    def machine_update(self,ui,machine):
+        if self.triggered:
+            machine.gui_trigger(self.text)
+            self.triggered=False
+class Inventory(Element):
+    def __init__(self,mslot):
+        self.inv=mslot
+    def inside(self,rpos,w):
+        return rpos.x+rpos.y*w<len(self.inv.slots)
+    def render(self,screen,y,size,rcpos=None):
+        for n,s in enumerate(self.inv.slots):
+            s.render(screen,(n%size.x*64,n//size.x*64+y),3)
+            if rcpos is not None:
+                screen.blit(sel[3],Vector.VectorX(0,y)+rcpos*64)
+    def on_a(self,rpos,w,p):
+        self.inv.slots[rpos.x].transfer(p.inv)
+    def on_drop(self,rpos,w,slot):
+        slot.transfer(self.inv.slots[rpos.x])
+
+    
+
+
+
+
+
+
+
+
+
+
