@@ -12,3 +12,5 @@ class Overlay(Object):
         return self.imgs[self.i]
 class Arrow(Overlay):
     imgs=Img.imgrot(Img.imgx("Overlays/Arrow"))
+class OneTwo(Overlay):
+    imgs=Img.imgstripx("Overlays/OneTwo")

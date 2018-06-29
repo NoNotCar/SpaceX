@@ -11,7 +11,7 @@ screen.convert()
 clock=pygame.time.Clock()
 from Lib import Img, Controllers, Colour, GUI
 from random import randint,choice,shuffle
-#from Game import Level
+from Game import Gamemodes
 tfont= Img.fload("cool", 64)
 sfont= Img.fload("cool", 32)
 controllers= [Controllers.Keyboard1()] + [Controllers.UniJoyController(n) for n in range(pygame.joystick.get_count())]
@@ -23,7 +23,8 @@ menu.add_screen(GUI.Screen((0,0,0)),Vector.right)
 menu.last.add_element(GUI.Text("PLAYER SELECT",V(0,0),64,(255,255,255)),"centre")
 menu.last.add_element(GUI.ColourSelect(controllers,V(0,100)),"centre")
 menu.add_screen(GUI.Screen((0,0,50)),V(2,0))
-menu.last.add_element(GUI.SButton(controllers,"START",Vector.zero),"centred")
+for n,gm in enumerate(Gamemodes.gamemodes):
+    menu.last.add_element(GUI.SButton(controllers,gm,V(0,n*64)),"centred")
 tick=0
 frame=False
 def rscale(i):

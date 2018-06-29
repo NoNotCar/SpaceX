@@ -21,6 +21,7 @@ class Object(object):
     slayer=None
     inverse_support=False
     owned=False
+    exists=True
     def __init__(self,coords):
         self.coords=coords
     def render(self, layer, surf, tpos, area,scale=3):
@@ -52,6 +53,12 @@ class Object(object):
         if self.hardness:
             area.dobj(self,pos)
             return True
+    def on_spawn(self,area,pos):
+        self.exists=True
+    def on_dest(self,area,pos):
+        self.exists=False
+    def re_own(self,p):
+        pass
     def gui_trigger(self,*args):
         pass
     def is_visible(self,p):
@@ -79,6 +86,8 @@ class Owned(Object):
     def __init__(self,coords,p):
         self.p=p
         super().__init__(coords)
+    def re_own(self,p):
+        self.p=p
 class Rotowned(Rotatable):
     owned = True
     def __init__(self,c,r,p):

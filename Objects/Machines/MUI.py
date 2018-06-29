@@ -109,7 +109,7 @@ class HandCrafting(Element):
             taken=Counter()
             for item,n in i.items():
                 taken+=p.inv.remove(item,n)
-            added=p.inv.add(prd,q)
+            added=p.inv.add(prd.new(),q)
             if added!=q:
                 p.inv.remove(prd.name,added)
                 for item, n in taken.items():
@@ -255,7 +255,7 @@ class Processor(Element):
         if self.cr:
             if self.progress==self.cr[2]:
                 if self.output.can_add(*self.cr[1]):
-                    self.output.add(*self.cr[1])
+                    self.output.add(self.cr[1][0].new(),self.cr[1][1])
                     self.cr=None
                     self.progress=0
             else:
@@ -301,7 +301,7 @@ class Crafter(Element):
         if self.progress:
             if self.progress==self.energy:
                 if self.output.can_add(*self.recipe[1]):
-                    self.output.add(*self.recipe[1])
+                    self.output.add(self.recipe[1][0].new(),self.recipe[1][1])
                     self.progress=0
             else:
                 self.progress+=ui.get_power(min(self.power,self.energy-self.progress))

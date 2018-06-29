@@ -13,11 +13,11 @@ Registry.add_recipe({"Iron":1,"Wire":2},Items.resources["Circuit"])
 Registry.add_recipe({"Copper":1},(Items.resources["Wire"],3))
 Research.add_recipesearch({"ChaosCrystal":3,"Stone":10},(Items.resources["ChaosCrystal"],4),[1],10)
 class Universe(object):
-    gm=Gamemodes.Standard()
-    def __init__(self,js,ssz):
+    def __init__(self,js,ssz,gm):
         self.area=Area.InfiniteArea(Generators.Earth())
         self.players=[Player(None,j) for j in js]
         shuffle(self.players)
+        self.gm=gm
         self.gm.setup(self.area,self.players)
         for p in self.players:
             p.ssz=ssz

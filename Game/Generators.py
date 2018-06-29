@@ -25,6 +25,11 @@ class Building(Generator):
         area.set_tile("MetalFloor",pos)
         if (not all(pos) or not pos.within(area.bounds-V(1,1))) and (pos.x==area.bounds.x//2 or pos.y==area.bounds.y//2):
             area.spawn_new(Overlays.Arrow, pos,3 if pos.x==0 else 0 if pos.y==0 else 1 if pos.x==area.bounds.x-1 else 2)
+class EntangledBuilding(Generator):
+    def gen_pos(self,area,pos):
+        area.set_tile("MetalFloor",pos)
+        if (not all(pos) or not pos.within(area.bounds-V(1,1))) and (area.bounds.x//2 in (pos.x-1,pos.x+1) or area.bounds.y//2 in (pos.y-1,pos.y+1)):
+            area.spawn_new(Overlays.OneTwo,pos,pos.x-1==area.bounds.x//2 or pos.y-1==area.bounds.y//2)
 class SurfaceGen(Generator):
     ores=[]
     surface=None

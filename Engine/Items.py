@@ -36,6 +36,8 @@ class Item(object):
         pass
     def copy(self):
         return self.__class__()
+    def new(self):
+        return self.copy() if self.singular else self
 class Resource(Item):
     def __init__(self,name):
         self.name=name
@@ -49,7 +51,7 @@ class Placeable(Item):
             placeables[self.name]=self
     def use(self,area,tpos,tr,p):
         for l in self.pc.layers:
-            if area.get(l,tpos):
+            if not area.clear(l,tpos):
                 return False
         if not area.supported(self.pc,tpos):
             return False
@@ -79,7 +81,7 @@ class ObjPlaceable(Item):
         if self.o.rotates:
             self.o.r=tr
         if self.o.owned:
-            self.o.p=p
+            self.o.re_own(p)
         area.spawn(self.o,tpos)
         return True
     def stacks(self,other):

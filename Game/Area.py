@@ -33,6 +33,7 @@ class Area(object):
             nobj.coords.pos=pos
         else:
             nobj.coords=Vector.Coordinate(self,pos)
+        nobj.on_spawn(self,pos)
     def spawn_new(self,oc,pos,*args):
         self.spawn(oc(Vector.Coordinate(self,pos),*args),pos)
     def spawn_item(self,item,pos):
@@ -46,6 +47,7 @@ class Area(object):
         if obj:
             for l in obj.layers:
                 self.ldict[l].del_obj(pos)
+            obj.on_dest(self,pos)
         if (pos,obj) in self.ups:
             self.ups.remove((pos,obj))
     def super_dest(self,pos):
@@ -53,7 +55,8 @@ class Area(object):
             if l!="Tiles":
                 self.dest(l.name,pos)
     def move(self,obj,pos,d,warped=False,override_speed=None):
-        if not self.infinite and not (pos+d).within(self.bounds):
+        tpos = pos + d
+        if not self.infinite and not (tpos).within(self.bounds):
             if self.building:
                 warp=self.building.out_warp(self,pos,d)
                 if warp:
@@ -61,7 +64,7 @@ class Area(object):
             return False
         blocked=False
         for l in obj.layers:
-            o=self.get(l,pos+d)
+            o=self.get(l, tpos)
             if o:
                 blocked=True
                 warp=o.in_warp(d)
@@ -71,20 +74,20 @@ class Area(object):
                     if not warped:
                         self.dobj(obj, pos)
                     for l in obj.layers:
-                        self.ldict[l].outobjs[pos + d] = obj
+                        self.ldict[l].outobjs[tpos] = obj
                     obj.lmo = -d
                     obj.mprog = 64
                     obj.aspeed = override_speed or obj.mspeed
                     self.mups.add(obj)
                     return True
-        if blocked or not self.supported(obj,pos+d):
+        if blocked or not self.supported(obj, tpos):
             return False
         if not warped:
             self.dobj(obj,pos)
-        self.spawn(obj,pos+d)
+        self.spawn(obj, tpos)
         if warped:
             for l in obj.layers:
-                self.ldict[l].outobjs[pos + d] = obj
+                self.ldict[l].outobjs[tpos] = obj
         obj.lmo=-d
         obj.mprog=64
         obj.aspeed=override_speed or obj.mspeed

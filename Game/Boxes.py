@@ -37,4 +37,33 @@ class SpawnBox(Box):
     @property
     def hardness(self):
         return 0
+class EntangledDummy(object):
+    def __init__(self,e1):
+        self.es=[e1]
+    def out_warp(self,iarea,pos,d):
+        o=iarea.get("Overlay",pos)
+        if o and len(self.es)>o.i and self.es[o.i].exists:
+            return self.es[o.i].coords+d
+class EntangledBox1(Box):
+    img=Img.imgstripxf("Buildings/EntangledBox")[0]
+    gen=Generators.EntangledBuilding()
+    def __init__(self,c):
+        Object.__init__(self,c)
+        self.dummy=EntangledDummy(self)
+        self.area=Area(self.internalsize,self.gen,self.dummy)
+    def in_warp(self,d):
+        hb=self.area.bounds//2
+        return Coordinate(self.area,hb-d*hb-V(bool(d.y),bool(d.x)))
+class EntangledBox2(Box):
+    img=Img.imgstripxf("Buildings/EntangledBox")[1]
+    def __init__(self,c,a,d):
+        Object.__init__(self,c)
+        self.area=a
+        self.dummy=d
+        self.dummy.es.append(self)
+    def update(self, pos, area, events):
+        self.area.generate(area.get_power)
+    def in_warp(self,d):
+        hb=self.area.bounds//2
+        return Coordinate(self.area,hb-d*hb+V(bool(d.y),bool(d.x)))
 Registry.add_recipe({"Steel":4,"Wire":10,"ChaosCrystal":1},Items.Placeable(StdBox))

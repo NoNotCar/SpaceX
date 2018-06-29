@@ -271,8 +271,9 @@ class TextEntry(Element):
     def ctext(self):
         return self.text+self.suffix
 class SButton(Button):
-    def __init__(self,cs,text,pos):
-        Button.__init__(self,text,pos)
+    def __init__(self,cs,gm,pos):
+        self.gm=gm
+        Button.__init__(self,gm.name,pos)
         self.cs=cs
     def on_click(self, system, rpos):
         from Game import Universe
@@ -280,7 +281,7 @@ class SButton(Button):
         acs=[c for c in self.cs if c.col]
         ss=(V(7,8) if len(acs)>4 else V(10,8) if len(acs)>2 else V(13,13))
         ass=ss*64+V(0,16)
-        system.u=Universe.Universe(acs,ss)
+        system.u=Universe.Universe(acs,ss,self.gm)
         offs=self.gen_offs(len(acs))
         for n,c in enumerate(acs):
             system.last.add_element(Viewport(ass*offs[n],ss,system.u.players[n]),"centred")

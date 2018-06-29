@@ -20,7 +20,6 @@ class Furnace(SlotMachine):
     @property
     def img(self):
         return self.imgs[bool(self.processor.progress)]
-#TODO: team resets for autocrafter and lab
 class AutoCrafter(SlotMachine):
     imgs=Img.imgstripxf("Machines/AutoCrafter",16)
     processor=None
@@ -38,6 +37,9 @@ class AutoCrafter(SlotMachine):
             self.gui.re_init("AutoCrafter",[self.processor,self.electro,MUI.Button("Change Recipe")])
     def input(self,d,i):
         return self.processor and self.processor.inputs.add(i,1)
+    def re_own(self,p):
+        self.p=p
+        self.gui = MUI.MUI("Select Recipe", [MUI.RSelect(get_recipes(self.p.team, "Crafting"))])
     @property
     def img(self):
         return self.imgs[bool(self.processor and self.processor.progress)]
