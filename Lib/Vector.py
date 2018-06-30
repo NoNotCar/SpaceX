@@ -87,6 +87,8 @@ class Coordinate(object):
     def match(self,other):
         self.area=other.area
         self.pos=other.pos
+    def get(self,layer):
+        return self.area.get(layer,self.pos)
     def __iter__(self):
         yield self.area
         yield self.pos
