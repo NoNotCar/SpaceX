@@ -54,9 +54,9 @@ class Area(object):
         for l in self.layers:
             if l!="Tiles":
                 self.dest(l.name,pos)
-    def move(self,obj,pos,d,warped=False,override_speed=None):
-        tpos = pos + d
-        if not self.infinite and not (tpos).within(self.bounds):
+    def move(self,obj,pos,d,warped=False,override_speed=None,tpos_cache=None):
+        tpos = tpos_cache or pos + d
+        if not self.infinite and not tpos.within(self.bounds):
             if self.building:
                 warp=self.building.out_warp(self,pos,d)
                 if warp:

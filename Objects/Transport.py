@@ -15,13 +15,17 @@ class Conveyor(Rotatable):
     hardness = 10
     slayer = "Tiles"
     cm=None
+    def __init__(self,c,r):
+        super().__init__(c,r)
+        self.tpos=c.pos+Vector.vdirs[self.r]
+        self.d=Vector.vdirs[self.r]
     def update(self, pos, area, events):
         if self.cm:
             self.cm.conv_update(pos,area,self)
         self.ani=area.anitick
         item=area.get("Items",pos)
         if item and not item.mprog:
-            area.move(item,pos,Vector.vdirs[self.r],override_speed=self.cspeed)
+            area.move(item,pos,self.d,override_speed=self.cspeed,tpos_cache=self.tpos)
     def mined(self):
         return Placeable(self.__class__)
     @property

@@ -3,22 +3,25 @@ from Lib import Img
 from . import Registry
 from Engine import Items
 all_researches=[]
+research_imgs={}
 def tuplise(t):
     return t if isinstance(t,tuple) else (t,1)
 class Research(object):
-    img=None
     packs=[]
     n=0
     name="Research"
     requirements=()
     def effect(self,team):
         pass
+    @property
+    def img(self):
+        return research_imgs[self.name]
 class RecipeResearch(Research):
     def __init__(self,recipes,packs,n,img,name):
         self.recipes=recipes
         self.packs=packs
         self.n=n
-        self.img=img
+        research_imgs[name]=img
         self.name=name
     def effect(self,team):
         for r in self.recipes:
@@ -30,14 +33,18 @@ class SRResearch(Research):
         self.n=n
         self.packs=packs
         self.t=type
-        self.img=self.o[0].img
         self.name=self.o[0].name
+        research_imgs[self.name]=self.o[0].img
     def effect(self,team):
         Registry.add_recipe(self.i,self.o,self.t,team)
+def starting_researches():
+    return [r for r in all_researches if not r.requirements]
+def ret_none():
+    return None
 rprogs=defaultdict(int)
-current_research=defaultdict(lambda :None)
+current_research=defaultdict(ret_none)
 done=defaultdict(list)
-current=defaultdict(lambda :[r for r in all_researches if not r.requirements])
+current=defaultdict(starting_researches)
 def add_research(r,requirements=()):
     r.requirements=requirements+tuple("SP%s" % n for n in r.packs if n>1)
     all_researches.append(r)

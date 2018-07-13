@@ -291,7 +291,27 @@ class SButton(Button):
         if n>2:
             return sum(([V(x/2,-0.5),V(x/2,0.5)] for x in range(-((n+1)//2)+1,(n+1)//2,2)),[])
         return [V(-0.5,0),V(0.5,0)] if n>1 else [Vector.zero]
-
+class CButton(Button):
+    def __init__(self,cs,pos):
+        Button.__init__(self,"CONTINUE",pos)
+        self.cs=cs
+    def on_click(self, system, rpos):
+        from Game import Universe
+        system.add_screen(Screen((10,10,10)),system.spos+Vector.right)
+        acs=[c for c in self.cs if c.col]
+        ss=(V(7,8) if len(acs)>4 else V(10,8) if len(acs)>2 else V(13,13))
+        ass=ss*64+V(0,16)
+        system.u=Universe.load("autosave")
+        system.u.reload(acs,ss)
+        offs=self.gen_offs(len(acs))
+        for n,c in enumerate(acs):
+            system.last.add_element(Viewport(ass*offs[n],ss,system.u.players[n]),"centred")
+        system.switch(Vector.right)
+        system.dj.switch("Main")
+    def gen_offs(self,n):
+        if n>2:
+            return sum(([V(x/2,-0.5),V(x/2,0.5)] for x in range(-((n+1)//2)+1,(n+1)//2,2)),[])
+        return [V(-0.5,0),V(0.5,0)] if n>1 else [Vector.zero]
 
 
 

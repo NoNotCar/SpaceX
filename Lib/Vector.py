@@ -1,8 +1,12 @@
 import math
 from random import randint
+special_mode=False
 class VectorX(tuple):
     def __new__(cls,*n):
-        return super(VectorX,cls).__new__(cls,n)
+        if special_mode:
+            return tuple.__new__(VectorX, n[0] if isinstance(n[0],tuple) else n)
+        else:
+            return tuple.__new__(VectorX,n)
     def __add__(self, other):
         return VectorX(*(x + y for x, y in zip(self, other)))
     def __sub__(self, other):

@@ -69,11 +69,13 @@ class Player(Object):
                         area.spawn_item(cslot.item,tpos)
                         cslot.remove(1)
     def explode(self,area,pos,tier):
+        area.dobj(self,pos)
+        self.respawn()
+        return True
+    def respawn(self):
         self.inv = Items.MultiSlot([Items.Slot() for _ in range(7)])
         self.inv.add(Tools.Pickaxe())
         self.spawn.respawn(self)
-        area.dobj(self,pos)
-        return True
     def enter_gui(self,gui):
         self.gui=gui
         gui.on_enter(self.j,self.ssz)

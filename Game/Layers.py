@@ -38,11 +38,11 @@ class Layer(object):
         self.objs={}
     def del_obj(self,pos):
         del self.objs[pos]
+imgcache={}
 class TileLayer(Layer):
     def __init__(self,off,name):
         Layer.__init__(self,off,name)
         self.utscache={}
-        self.imgcache={}
         self.recache=set()
         self.blocked=set()
     def regen_uts(self,pos,area):
@@ -51,10 +51,10 @@ class TileLayer(Layer):
             for tpos in Vector.iter_offsets(pos, Vector.vdirs + Vector.ddirs):
                 area.ping(tpos)
         surround = [at] + [self[tpos] for tpos in Vector.iter_offsets(pos, Vector.vdirs + Vector.ddirs) if self[tpos]]
-        torender = sorted(set(t for t in surround if Tiles.tiles.index(t) <= Tiles.tiles.index(surround[0])))
+        torender = sorted(set(t for t in surround if Tiles.tileorder[t.name] <= Tiles.tileorder[surround[0].name]))
         comp=[(torender[0],(4,4,4,4))]
         for t in torender[1:]:
-            uts = Vector.get_uts(pos, self, lambda ot: Tiles.tiles.index(ot) >= Tiles.tiles.index(t))
+            uts = Vector.get_uts(pos, self, lambda ot: Tiles.tileorder[ot.name] >= Tiles.tileorder[t.name])
             if uts != (0, 0, 0, 0) or t == at:
                 comp.append((t,uts))
         comp=tuple(comp)
@@ -64,12 +64,12 @@ class TileLayer(Layer):
     def get_img(self,comp):
         # FLASHBACKS
         try:
-            return self.imgcache[comp]
+            return imgcache[comp]
         except KeyError:
             img=comp[0][0].uts[comp[0][1]].copy()
             for t,uts in comp[1:]:
                 img.blit(t.uts[uts],V(0,0))
-            self.imgcache[comp]=img
+            imgcache[comp]=img
             return img
     def render(self,surf,poss,start,offset,area,player):
         ox,oy=V(0,self.off)+offset

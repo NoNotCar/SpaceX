@@ -62,7 +62,10 @@ class EntangledBox2(Box):
         self.dummy=d
         self.dummy.es.append(self)
     def update(self, pos, area, events):
-        self.area.generate(area.get_power)
+        if not self.dummy.es[0].exists:
+            super().update(pos,area,events)
+        else:
+            self.area.generate(area.get_power)
     def in_warp(self,d):
         hb=self.area.bounds//2
         return Coordinate(self.area,hb-d*hb+V(bool(d.y),bool(d.x)))

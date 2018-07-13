@@ -48,6 +48,7 @@ class Bridger(Item):
 class ChainSaw(Item):
     img=Img.imgx("Tools/ChainSaw")
     stack_size = 1
+    name="Chainsaw"
     def use(self,area,tpos,tr,p):
         tree=area.get("Objects",tpos)
         if tree and tree.name=="Tree" and p.inv.add(tree.mined()):
@@ -59,6 +60,7 @@ class EntangledPlacer(Item):
     stack_size = 1
     phase=0
     e1=None
+    name="EntangledPlacer"
     def use(self,area,tpos,tr,p):
         for l in Boxes.EntangledBox1.layers:
             if not area.clear(l,tpos):

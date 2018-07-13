@@ -23,6 +23,7 @@ menu.add_screen(GUI.Screen((0,0,0)),Vector.right)
 menu.last.add_element(GUI.Text("PLAYER SELECT",V(0,0),64,(255,255,255)),"centre")
 menu.last.add_element(GUI.ColourSelect(controllers,V(0,100)),"centre")
 menu.add_screen(GUI.Screen((0,0,50)),V(2,0))
+menu.last.add_element(GUI.CButton(controllers,V(0,-64)),"centred")
 for n,gm in enumerate(Gamemodes.gamemodes):
     menu.last.add_element(GUI.SButton(controllers,gm,V(0,n*64)),"centred")
 tick=0

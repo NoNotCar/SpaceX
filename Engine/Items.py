@@ -41,11 +41,12 @@ class Item(object):
 class Resource(Item):
     def __init__(self,name):
         self.name=name
-        self.img=Img.imgx("Resources/"+name)
+    @property
+    def img(self):
+        return get_item_image(self.name)
 class Placeable(Item):
     def __init__(self,pc):
         self.name=pc.get_name()
-        self.img=get_item_image(self.name)
         self.pc=pc
         if self.name not in placeables:
             placeables[self.name]=self
@@ -65,12 +66,14 @@ class Placeable(Item):
             area.spawn_new(self.pc,tpos)
         return True
     @property
+    def img(self):
+        return get_item_image(self.name)
+    @property
     def stack_size(self):
         return self.pc.override_ss or 10
 class ObjPlaceable(Item):
     def __init__(self,o):
         self.name=o.get_name()
-        self.img=get_item_image(self.name)
         self.o=o
     def use(self,area,tpos,tr,p):
         for l in self.o.layers:
@@ -86,6 +89,9 @@ class ObjPlaceable(Item):
         return True
     def stacks(self,other):
         return False
+    @property
+    def img(self):
+        return get_item_image(self.name)
 resources={n:Resource(n) for n in [f[:-4] for f in os.listdir(Img.np(Img.loc+"/Resources"))]}
 placeables={}
 fuels={"Coal":400,"Log":200}

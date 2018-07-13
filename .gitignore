@@ -107,3 +107,6 @@ venv.bak/
 
 # Copyright
 *.ogg
+
+#Saves
+*.sav
