@@ -15,6 +15,8 @@ class Player(Object):
     vehicle=None
     team=None
     spawn=None
+    targetable = True
+    hp=1
     def __init__(self,coords,j):
         super().__init__(coords)
         self.col=j.col
@@ -76,9 +78,15 @@ class Player(Object):
         self.inv = Items.MultiSlot([Items.Slot() for _ in range(7)])
         self.inv.add(Tools.Pickaxe())
         self.spawn.respawn(self)
+        self.hp=1
     def enter_gui(self,gui):
         self.gui=gui
         gui.on_enter(self.j,self.ssz)
+    def on_shoot(self,area,pos,power):
+        self.hp-=power
+        if self.hp<=0:
+            area.dobj(self, pos)
+            self.respawn()
     @property
     def img(self):
         return pimgs[self.col][self.d]

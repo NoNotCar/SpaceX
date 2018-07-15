@@ -8,7 +8,7 @@ import math
 class Miner(Machine):
     imgs=Img.imgstripxf("Machines/Miner",16)
     mine_prog=0
-    mine_speed=0.5
+    mine_speed=0.25
     a=0
     mrects=[Rect(4,36,56,40),Rect(4,4,44,72),Rect(4,4,56,44),Rect(16,4,44,72)]
     def update(self, pos, area, events):

@@ -1,7 +1,7 @@
-from .Layers import Layer,TileLayer
+from .Layers import Layer,TileLayer,FXLayer
 from Lib import Vector,Img
 from Engine import Items
-from . import Tiles
+from . import Tiles,Player
 from random import shuffle
 from Objects import War
 V=Vector.VectorX
@@ -16,18 +16,22 @@ class Area(object):
     emax=10
     def __init__(self,bounds,generator,building):
         self.bounds=bounds
-        self.layers=[TileLayer(16,"Tiles"),Layer(16,"Overlay"),Layer(16,"Conv"),Layer(16,"Items"),Layer(0,"Objects")]
+        self.layers=[TileLayer(16,"Tiles"),Layer(16,"Ore"),Layer(16,"Overlay"),Layer(16,"Conv"),Layer(16,"Items"),Layer(0,"Objects"),FXLayer("FX")]
         self.ldict = {l.name: l for l in self.layers}
         self.ups=set()
         self.mups=set()
+        self.targets=set()
         self.gen=generator
         self.building=building
-        generator.generate(self)
+        if not self.infinite:
+            generator.generate(self)
     def spawn(self,nobj,pos):
         for l in nobj.layers:
             self.ldict[l][pos]=nobj
         if nobj.updates:
             self.ups.add((pos,nobj))
+        if nobj.targetable:
+            self.targets.add(nobj)
         if nobj.coords:
             nobj.coords.area=self
             nobj.coords.pos=pos
@@ -50,6 +54,8 @@ class Area(object):
             obj.on_dest(self,pos)
         if (pos,obj) in self.ups:
             self.ups.remove((pos,obj))
+        if obj in self.targets:
+            self.targets.remove(obj)
     def super_dest(self,pos):
         for l in self.layers:
             if l!="Tiles":
@@ -192,14 +198,12 @@ class Area(object):
         if self.infinite:
             return 0
         self.ebuffer+=gfunc(self.emax-self.ebuffer)
+    def __getitem__(self, item):
+        return self.ldict[item]
 class InfiniteArea(Area):
     infinite = True
     def __init__(self,generator):
-        self.layers=[TileLayer(16,"Tiles"),Layer(16,"Ore"),Layer(16,"Conv"),Layer(16,"Items"),Layer(0,"Objects")]
-        self.ldict = {l.name: l for l in self.layers}
-        self.ups=set()
-        self.mups=set()
-        self.gen=generator
+        super().__init__(None,generator,None)
         self.explored=set()
     def render(self,surf,player,pos):
         sr=surf.get_rect()

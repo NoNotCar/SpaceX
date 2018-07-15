@@ -3,7 +3,7 @@ from Lib import Img,Vector
 from .Machines.Base import Machine,FixedMachine
 from Game.Registry import add_recipe
 from Game.Research import add_recipesearch
-from Engine.Items import Placeable,MultiSlot,Slot
+from Engine.Items import Placeable,MultiSlot,Slot,chaos_slots
 from .Machines import MUI
 class Conveyor(Rotatable):
     override_name="Conveyor1"
@@ -72,6 +72,33 @@ class Storage(FixedMachine):
         self.gui=MUI.MUI("Storage",[MUI.Inventory(self.inv)])
     def input(self,d,i):
         return self.inv.add(i)
+class Buffer(Machine):
+    imgs=[Img.imgx("Transport/Buffer")]
+    def __init__(self,c,r,p):
+        super().__init__(c,r,p)
+        self.inv=MultiSlot([Slot() for _ in range(7)])
+        self.gui=MUI.MUI("Buffer",[MUI.Inventory(self.inv)])
+        self.v=Vector.vdirs[self.r]
+    def input(self,d,i):
+        if d==self.v:
+            return self.inv.add(i)
+    def update(self, pos, area, events):
+        if not self.output[self.v]:
+            for s in self.inv.slots:
+                if s.q:
+                    if self.add_output(s.item):
+                        s.remove(1)
+class ChaosChest(FixedMachine):
+    imgs=[Img.imgx("Transport/ChaosChest")]
+    def __init__(self,c,p):
+        super().__init__(c,p)
+        self.inv=MUI.ChaosInventory(self.p.team)
+        self.gui=MUI.MUI("Chaos Chest",[self.inv])
+    def input(self,d,i):
+        return chaos_slots[self.p.team].add(i,1)
+    def re_own(self,p):
+        self.p=p
+        self.inv.team=p.team
 class Tunnel(Rotatable):
     imgs=Img.imgstripxf("Transport/Tunnel")
     updates = False
@@ -91,8 +118,10 @@ class Tunnel(Rotatable):
         return Placeable(Tunnel)
 add_recipe({"Gear":1,"Iron":2},(Placeable(Conveyor),5))
 add_recipe({"Conveyor1":2,"Iron":4},Placeable(Crossover))
-add_recipe({"Conveyor1":2,"Iron":3,"Gear":1},Placeable(Splitter))
+add_recipe({"Conveyor1":2,"Iron":3},Placeable(Splitter))
 add_recipe({"Log":5},Placeable(Storage))
 add_recipesearch({"Conveyor1":1,"Gear":3},Placeable(Conveyor2),[1],40)
 add_recipesearch({"Brick":5,"ChaosCrystal":1},Placeable(Tunnel),[1],20)
+add_recipesearch({"Steel":2,"Storage":1},Placeable(Buffer),[1],10)
+add_recipesearch({"ChaosCrystal":1,"Storage":1},Placeable(ChaosChest),[1],40)
 add_recipe({"Conveyor1":1,"Iron":3},Placeable(Input))

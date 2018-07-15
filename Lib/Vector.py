@@ -54,6 +54,10 @@ class VectorX(tuple):
                 yield x,y
     def within(self, other):
         return all(0<=self[n]<other[n] for n in range(len(self)))
+    def angle_to(self,other):
+        return math.atan2(self.y-other.y,other.x-self.x)
+    def len_to(self,other):
+        return sum((self[n]-other[n])**2 for n in range(len(self)))**0.5
     @property
     def rlen(self):
         return sum(x**2 for x in self)**0.5

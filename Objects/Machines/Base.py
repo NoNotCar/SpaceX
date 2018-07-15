@@ -10,14 +10,16 @@ class Machine(Rotowned):
     def __init__(self,c,r,p):
         super().__init__(c,r,p)
         self.output={v:None for v in Vector.vdirs}
+        self.outputpos={v:self.coords.pos+v for v in Vector.vdirs}
     def update(self, pos, area, events):
         if self.gui:
             self.gui.mupdate(self)
         for d,i in self.output.items():
             if i:
-                c=area.get("Conv",pos+d)
+                tpos=self.outputpos[d]
+                c=area.get("Conv",tpos)
                 c=c if c and "Conveyor" in c.name else None
-                if area.move(i,pos,d,True,c.cspeed if c else None):
+                if area.move(i,pos,d,True,c.cspeed if c else None,tpos_cache=tpos):
                     self.output[d]=None
     def add_output(self,item,add_r=0,override_d=None):
         d=override_d or Vector.vdirs[(self.r+add_r)%4]

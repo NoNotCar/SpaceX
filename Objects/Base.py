@@ -22,6 +22,8 @@ class Object(object):
     inverse_support=False
     owned=False
     exists=True
+    targetable=False
+    team=None
     def __init__(self,coords):
         self.coords=coords
     def render(self, layer, surf, tpos, area,scale=3):
@@ -63,6 +65,8 @@ class Object(object):
         pass
     def is_visible(self,p):
         return True
+    def on_shoot(self,area,pos,power):
+        pass
     @property
     def name(self):
         return self.override_name or self.__class__.__name__

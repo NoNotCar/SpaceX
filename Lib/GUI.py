@@ -237,6 +237,9 @@ class Viewport(Surface):
         self.img.blit(self.rwidge[self.player.tr][3],(0,self.size.y*64-16))
         if selitem and selitem.prog and self.player.j.get_pressed()[0]:
             pygame.draw.rect(self.img,self.player.col,Rect(0,self.size.y*64-16,self.size.x*64*selitem.prog/selitem.prog_max,16))
+        hp=self.player.vehicle.hp if self.player.vehicle else self.player.hp
+        if hp!=1:
+            pygame.draw.rect(self.img, (255,0,0),Rect(0, self.size.y * 64, self.size.x * 64 * hp, 16))
         pygame.draw.rect(self.img,self.player.col,self.img.get_rect(),1)
 class TextEntry(Element):
     active=False

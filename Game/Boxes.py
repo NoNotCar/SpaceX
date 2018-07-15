@@ -32,11 +32,19 @@ class StdBox(Box):
     img=Img.imgx("Buildings/StdBox")
 class SpawnBox(Box):
     img=Img.imgx("Buildings/SpawnBox")
+    def __init__(self,c,t):
+        super().__init__(c)
+        self.team=t
     def in_warp(self,d):
         return False
+    def mined(self):
+        from Lib import GUI
+        raise GUI.GameEnd(not self.team)
+    def explode(self,area,pos,tier):
+        pass
     @property
     def hardness(self):
-        return 0
+        return 600
 class EntangledDummy(object):
     def __init__(self,e1):
         self.es=[e1]

@@ -38,6 +38,23 @@ class Layer(object):
         self.objs={}
     def del_obj(self,pos):
         del self.objs[pos]
+class FXLayer(Layer):
+    def __init__(self,name):
+        self.fx=set()
+        super().__init__(0,name)
+    def add(self,fx):
+        self.fx.add(fx)
+    def remove(self,fx):
+        self.fx.remove(fx)
+    def update(self):
+        for fx in set(self.fx):
+            fx.update(self)
+    def render(self,surf,poss,start,offset,area,player):
+        offset-=start*64
+        for fx in self.fx:
+            fx.render(surf,offset)
+
+
 imgcache={}
 class TileLayer(Layer):
     def __init__(self,off,name):
@@ -82,6 +99,9 @@ class TileLayer(Layer):
                 self.regen_uts(v,area)
                 surf.blit(self.get_img(self.utscache[v])[3], ((vx - sx) * 64 + ox, (vy - sy) * 64 + oy))
     def __setitem__(self, key, value):
-        self.objs[key] = value
+        self.objs[key] = value.name
         self.recache.add(key)
         self.recache.update(set(Vector.iter_offsets(key,Vector.vdirs+Vector.ddirs)))
+    def __getitem__(self, item):
+        t=self.objs.get(item, None)
+        return None if t is None else Tiles.tdict[t]

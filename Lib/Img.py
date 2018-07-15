@@ -17,9 +17,9 @@ from . import Colour
 
 class ScaledImage(object):
     def __init__(self,img):
-        self.imgs=(img,)+tuple(xn(img,n) for n in (2,3,4))
-        self.img=img
-        self.h,self.w=img.get_height(),img.get_width()
+        self.imgs=img if isinstance(img,list) else (img,)+tuple(xn(img,n) for n in (2,3,4))
+        self.img=self.imgs[0]
+        self.h,self.w=self.img.get_height(),self.img.get_width()
     def blit(self,other,tpos,**kwargs):
         for n,i in enumerate(self.imgs):
             i.blit(other.imgs[n],(tpos[0]*(n+1),tpos[1]*(n+1)),**kwargs)
@@ -213,6 +213,18 @@ def draw_rotor(screen,center,radius,arms,angle,col,w=4):
         #magic
         pygame.draw.polygon(screen,col,(polplus(center,angle-hpi,w),polplus(center,angle+hpi,w),polplus(polplus(center,angle+hpi,w),angle,radius),polplus(polplus(center,angle-hpi,w),angle,radius)))
         angle+=tau/arms
+def rot_center(image, angle):
+    """rotate an image while keeping its center and size"""
+    rots=[]
+    for i in image.imgs:
+        orig_rect = i.get_rect()
+        rot_image = pygame.transform.rotate(i, angle)
+        rot_rect = orig_rect.copy()
+        rot_rect.center = rot_image.get_rect().center
+        rots.append(rot_image.subsurface(rot_rect).copy())
+    return ScaledImage(rots)
+def lotsrots(img,degscale,sym=1):
+    return [rot_center(img,ang) for ang in range(0,360//sym,degscale)]
 imss=[]
 class ImageManager(object):
     def __init__(self):

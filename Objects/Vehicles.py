@@ -11,12 +11,16 @@ class Vehicle(Object):
     imgs=[]
     literally_just_entered=False
     hardness = 30
+    hp=1
+    armour=1
+    targetable = True
     def interact(self,player,ppos,pos,area):
         if not self.player:
             self.player=player
             area.dobj(player,ppos)
             player.vehicle=self
             self.literally_just_entered=True
+            self.team=player.team
     def update(self, pos, area, events):
         if self.literally_just_entered:
             self.literally_just_entered=False
@@ -29,6 +33,7 @@ class Vehicle(Object):
                     if area.move(self.player, pos, self.lv, True,64):
                         self.player.vehicle=None
                         self.player=None
+                        self.team=None
                         return
                 for v in j.get_dirs():
                     self.lv = v
@@ -40,6 +45,12 @@ class Vehicle(Object):
             self.ldx=self.lv.x or self.ldx
     def mined(self):
         return Items.Placeable(self.__class__)
+    def on_shoot(self,area,pos,power):
+        self.hp-=power/self.armour
+        if self.hp<=0:
+            area.dobj(self,pos)
+            self.player.respawn()
+            self.player.vehicle=None
     @property
     def img(self):
         return self.imgs[self.ldx==-1]

@@ -51,9 +51,12 @@ class Generator(FixedMachine):
         self.fuel=MUI.FuelSlot(20)
         self.gui=MUI.MUI("Generator",[self.fuel])
     def update(self, pos, area, events):
-        lfl=self.fuel.fleft
+        lfl=self.fuel.left
         area.generate(self.fuel.get_power)
-        self.working=lfl!=self.fuel.fleft
+        self.working=lfl!=self.fuel.left
+    def input(self,d,i):
+        if i.name in fuels:
+            return self.fuel.slot.add(i,1)
     @property
     def img(self):
         return self.imgs[self.working]

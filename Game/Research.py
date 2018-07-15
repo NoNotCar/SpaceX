@@ -38,7 +38,7 @@ class SRResearch(Research):
     def effect(self,team):
         Registry.add_recipe(self.i,self.o,self.t,team)
 def starting_researches():
-    return [r for r in all_researches if not r.requirements]
+    return sorted([r for r in all_researches if not r.requirements],key=lambda r:r.n)
 def ret_none():
     return None
 rprogs=defaultdict(int)

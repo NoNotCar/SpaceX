@@ -2,7 +2,7 @@ from Lib import Img,Vector,Colour
 import os
 from pygame import draw,Rect,error
 from Objects.Base import Object
-from collections import Counter
+from collections import Counter,defaultdict
 iimgs={}
 def get_item_image(name):
     try:
@@ -95,6 +95,7 @@ class ObjPlaceable(Item):
 resources={n:Resource(n) for n in [f[:-4] for f in os.listdir(Img.np(Img.loc+"/Resources"))]}
 placeables={}
 fuels={"Coal":400,"Log":200}
+ammos={"Ammo":10}
 class ItemObject(Object):
     layers = ["Items"]
     pickup=Img.sndget("pickup")
@@ -196,6 +197,11 @@ class FilterSlot(Slot):
         Img.draw_num(surf,self.q,pos,scale+1)
         if not self.q:
             surf.blit(self.trans[scale],pos)
+class ChaosSlot(FilterSlot):
+    backcol = (200, 100, 200)
+    trans = Img.trans_rect((16, 16), backcol + (128,))
+class ChaosPlaceHolder(Slot):
+    backcol = ChaosSlot.backcol
 class MultiSlot(object):
     def __init__(self,slots):
         self.slots=slots
@@ -219,3 +225,16 @@ class MultiSlot(object):
             s.render(surf,pos+Vector.VectorX(n*(scale*16+16),0),scale)
     def get_counter(self):
         return sum((Counter({s.item.name:s.q}) if s.item else Counter() for s in self.slots),Counter())
+class ChaosSlots(MultiSlot):
+    def __init__(self):
+        super().__init__([ChaosPlaceHolder()])
+        self.sdict={}
+    def add(self,item,q=1):
+        if item.name in self.sdict:
+            return self.sdict[item.name].add(item,q)
+        nslot=ChaosSlot(item)
+        nslot.q=q
+        self.slots.insert(len(self.slots)-1,nslot)
+        self.sdict[item.name]=nslot
+        return q
+chaos_slots=defaultdict(ChaosSlots)

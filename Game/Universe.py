@@ -35,7 +35,7 @@ class Universe(object):
             self.save()
         self.area.update(events)
     def saved(self):
-        return self,Research.current_research,Research.done,Research.rprogs
+        return self,Research.current_research,Research.done,Research.rprogs,Items.chaos_slots
     def save(self):
         with open(Img.np(Img.loc+"autosave.sav"),"wb") as f:
             pickle.dump(self.saved(),f)
@@ -47,6 +47,7 @@ class Universe(object):
                 p.col=js[n].col
             except IndexError:
                 p.coords.area.dobj(p,p.coords.pos)
+                self.players.remove(p)
             p.gui=None
         for x,j in enumerate(js[n+1:]):
             np=Player(None,j)
@@ -68,4 +69,5 @@ def load(file):
         for k,v in comp[1].items():
             Research.current_research[k] = re_search(v)
         Research.rprogs = comp[3]
+        Items.chaos_slots=comp[4]
         return universe

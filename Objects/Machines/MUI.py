@@ -173,41 +173,49 @@ class TSelect(Element):
             Research.current_research[self.team] = Research.current[self.team][rpos.x + rpos.y * w]
             if lr!=Research.current_research[self.team]:
                 Research.rprogs[self.team]=0
-class FuelSlot(Element):
+class ConsumableSlot(Element):
     colour=(240,200,100)
-    fleft=0
-    max_f=0
-    def __init__(self,max_output=None):
+    left=0
+    max_t=0
+    def __init__(self,ctype,colour=None,max_output=None):
         self.slot=Items.Slot()
+        if colour:
+            self.colour=colour
         self.slot.backcol=self.colour
+        self.ctype=ctype
         self.max_output=None if max_output is None else max_output/60
     def render(self,screen,y,size,rcpos=None):
         self.slot.render(screen,(0,y),3)
         if rcpos is not None:
             screen.blit(sel[3], (0,y))
-        if self.fleft:
-            draw.rect(screen,self.colour,Rect(64,y+16,(size.x*64-64)*self.fleft/self.max_f,32))
+        if self.left:
+            draw.rect(screen,self.colour,Rect(64,y+16,(size.x*64-64)*self.left/self.max_t,32))
     def on_a(self,rpos,w,p):
         if self.slot.item:
             self.slot.remove(p.inv.add(self.slot.item,self.slot.q))
     def on_drop(self,rpos,w,slot):
-        if slot.item and slot.item.name in Items.fuels:
+        if slot.item and slot.item.name in self.ctype:
             slot.transfer(self.slot)
-    def get_power(self,needed):
+    def get(self,needed):
         needed=self.max_output if self.max_output and self.max_output<needed else needed
         need=needed
         while needed:
-            if self.fleft:
-                trans=min(self.fleft,needed)
-                self.fleft-=trans
+            if self.left:
+                trans=min(self.left,needed)
+                self.left-=trans
                 needed-=trans
-            elif self.slot and self.slot.item.name in Items.fuels:
-                self.fleft+=Items.fuels[self.slot.item.name]
-                self.max_f=self.fleft
+            elif self.slot and self.slot.item.name in self.ctype:
+                self.left+=self.ctype[self.slot.item.name]
+                self.max_t=self.left
                 self.slot.remove(1)
             else:
                 break
         return need-needed
+class FuelSlot(ConsumableSlot):
+    def __init__(self,max_output=None):
+        super().__init__(Items.fuels,max_output=max_output)
+    def get_power(self,needed):
+        return self.get(needed)
 class ElectroSlot(Element):
     colour = (255, 216, 0)
     nullcolour=(100,100,100)
@@ -390,6 +398,14 @@ class Inventory(Element):
         self.inv.slots[rpos.x].transfer(p.inv)
     def on_drop(self,rpos,w,slot):
         slot.transfer(self.inv.slots[rpos.x])
+class ChaosInventory(Inventory):
+    def __init__(self,team):
+        self.team=team
+    def on_drop(self,rpos,w,slot):
+        slot.transfer(self.inv)
+    @property
+    def inv(self):
+        return Items.chaos_slots[self.team]
 
     
 
