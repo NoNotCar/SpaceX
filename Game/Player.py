@@ -26,6 +26,8 @@ class Player(Object):
         self.ss+=self.j.get_lr(events)
         self.ss%=7
         ss=self.j.get_start_select(events)
+        if self.hp<1:
+            self.hp+=0.001
         if self.gui:
             self.gui.update(self,events)
             if self.j.get_buttons(events)[1] or any(self.j.get_start_select(events)):
