@@ -53,9 +53,10 @@ class Universe(object):
             np=Player(None,j)
             np.spawn=self.players[min((x+n+1)%2,len(self.players)-1)].spawn
             np.respawn()
+            np.team=(x+n+1)%2
             self.players.append(np)
 def re_search(r):
-    return None if r is None else [re for re in Research.all_researches if re.name==r.name][0]
+    return None if r is None else [re for re in Research.all_researches if re.name==(r if isinstance(r,str) else r.name)][0]
 def load(file):
     Vector.special_mode=True
     with open(Img.np(Img.loc + "%s.sav" % file),"rb") as f:

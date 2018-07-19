@@ -41,7 +41,7 @@ class Vehicle(Object):
                         break
             rs=j.get_rstick()
             if rs:
-                self.lv = Vector.vdirs.index(rs)
+                self.lv = rs
             self.ldx=self.lv.x or self.ldx
     def mined(self):
         return Items.Placeable(self.__class__)

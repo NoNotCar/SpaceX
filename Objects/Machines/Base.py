@@ -10,7 +10,6 @@ class Machine(Rotowned):
     def __init__(self,c,r,p):
         super().__init__(c,r,p)
         self.output={v:None for v in Vector.vdirs}
-        self.outputpos={v:self.coords.pos+v for v in Vector.vdirs}
     def update(self, pos, area, events):
         if self.gui:
             self.gui.mupdate(self)
@@ -27,6 +26,9 @@ class Machine(Rotowned):
             self.output[d]=Items.ItemObject(self.coords.copy(),item)
             return True
         return False
+    def on_spawn(self,area,pos):
+        super().on_spawn(area,pos)
+        self.outputpos = {v: self.coords.pos + v for v in Vector.vdirs}
     def mined(self):
         return Items.ObjPlaceable(self) if self.gui else Items.Placeable(self.__class__)
     def interact(self,player,ppos,pos,area):

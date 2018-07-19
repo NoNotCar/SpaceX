@@ -19,7 +19,7 @@ def get_item(name):
         return resources[name]
     return placeables[name]
 class Item(object):
-    stack_size=10
+    stack_size=25
     name="Item"
     img=None
     prog=0

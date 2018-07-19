@@ -11,11 +11,11 @@ def starting_area(area,pos,ps,team):
         area.set_tile("Bridge", tpos)
     area.spawn_new(Boxes.SpawnBox, pos,team)
     sb=area.get("Objects",pos)
-    for n,pp in enumerate(Vector.iter_offsets(pos,Vector.ddirs)):
+    for n,pp in enumerate(Vector.iter_offsets(pos,Vector.ddirs+Vector.vdirs)):
         if n<len(ps):
             area.spawn(ps[n],pp)
             ps[n].spawn=sb.area
-    if ps:
+    if ps and team is not None:
         for v in Vector.ddirs:
             area.spawn_new(War.LaserTurret,pos+v*2,0,ps[0])
 
@@ -38,5 +38,5 @@ class Standard(Gamemode):
             p.team=n%2
 class Coop(Gamemode):
     def setup(self,area,ps):
-        starting_area(area,V(0,0),ps)
+        starting_area(area,V(0,0),ps,None)
 gamemodes=[Standard(),Coop()]
