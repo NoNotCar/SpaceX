@@ -19,5 +19,5 @@ def get_recipes(team,type):
     else:
         recipes[team]=defaultdict(list)
         for k,v in default_recipes.items():
-            recipes[team][k]=v
+            recipes[team][k]=v[:]
         return recipes[team][type]

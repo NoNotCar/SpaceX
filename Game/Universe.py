@@ -19,7 +19,6 @@ class Universe(object):
     def __init__(self,js,ssz,gm):
         self.area=Area.LargeArea(Vector.VectorX(100,100),Generators.Earth())
         self.players=[Player(None,j) for j in js]
-        shuffle(self.players)
         self.gm=gm
         self.gm.setup(self.area,self.players)
         for p in self.players:
