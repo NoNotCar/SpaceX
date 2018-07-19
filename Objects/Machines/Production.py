@@ -20,9 +20,10 @@ class Miner(Machine):
                 self.a %= math.tau
                 self.mine_prog+=self.mine_speed
                 if self.mine_prog>=ore.hardness and self.add_output(Items.resources[ore.name]):
-                    ore.q-=1
-                    if ore.q==0:
-                        area.dobj(ore,pos)
+                    if not ore.inf:
+                        ore.q-=1
+                        if ore.q==0:
+                            area.dobj(ore,pos)
                     self.mine_prog=0
     def render(self, layer, surf, tpos, area,scale=3):
         if layer==self.renderlayer:

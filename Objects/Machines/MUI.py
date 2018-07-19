@@ -387,6 +387,8 @@ class Button(Element):
 class Inventory(Element):
     def __init__(self,mslot):
         self.inv=mslot
+    def get_h(self,w):
+        return len(self.inv.slots) // w + 1
     def inside(self,rpos,w):
         return rpos.x+rpos.y*w<len(self.inv.slots)
     def render(self,screen,y,size,rcpos=None):
@@ -395,9 +397,9 @@ class Inventory(Element):
             if rcpos is not None:
                 screen.blit(sel[3],Vector.VectorX(0,y)+rcpos*64)
     def on_a(self,rpos,w,p):
-        self.inv.slots[rpos.x].transfer(p.inv)
+        self.inv.slots[rpos.x+rpos.y*w].transfer(p.inv)
     def on_drop(self,rpos,w,slot):
-        slot.transfer(self.inv.slots[rpos.x])
+        slot.transfer(self.inv.slots[rpos.x+rpos.y*w])
 class ChaosInventory(Inventory):
     def __init__(self,team):
         self.team=team
