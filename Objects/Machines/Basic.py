@@ -77,6 +77,6 @@ class Lab(FixedMachine):
     def img(self):
         return self.imgs[self.working]
 add_recipe({"Stone":5},Placeable(Furnace))
-add_recipe({"Gear":3,"Steel":4,"Circuit":3},Placeable(AutoCrafter))
+add_recipe({"Iron":10,"Circuit":3},Placeable(AutoCrafter))
 add_recipe({"Furnace":1,"Wire":8},Placeable(Generator))
 add_recipe({"AutoCrafter":1,"SP1":5},Placeable(Lab))

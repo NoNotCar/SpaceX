@@ -77,4 +77,4 @@ class EntangledBox2(Box):
     def in_warp(self,d):
         hb=self.area.bounds//2
         return Coordinate(self.area,hb-d*hb+V(bool(d.y),bool(d.x)))
-Registry.add_recipe({"Steel":4,"Wire":10,"ChaosCrystal":1},Items.Placeable(StdBox))
+Registry.add_recipe({"Steel":4,"ChaosCrystal":1},Items.Placeable(StdBox))

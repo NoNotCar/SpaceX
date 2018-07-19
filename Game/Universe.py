@@ -17,7 +17,7 @@ class Universe(object):
     AUTOSAVE_INTERVAL=3600
     t=0
     def __init__(self,js,ssz,gm):
-        self.area=Area.InfiniteArea(Generators.Earth())
+        self.area=Area.LargeArea(Vector.VectorX(100,100),Generators.Earth())
         self.players=[Player(None,j) for j in js]
         shuffle(self.players)
         self.gm=gm

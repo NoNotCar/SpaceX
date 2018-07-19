@@ -16,7 +16,7 @@ def starting_area(area,pos,ps,team):
             area.spawn(ps[n],pp)
             ps[n].spawn=sb.area
     if ps and team is not None:
-        for v in Vector.ddirs:
+        for v in Vector.ddirs+Vector.vdirs:
             area.spawn_new(War.LaserTurret,pos+v*2,0,ps[0])
 
 class Gamemode(object):
@@ -32,11 +32,13 @@ class Gamemode(object):
         return self.__class__.__name__
 class Standard(Gamemode):
     def setup(self,area,ps):
-        starting_area(area,V(-30,0),ps[::2],0)
-        starting_area(area,V(30,0),ps[1::2],1)
+        offset=area.bounds//2 if area.bounds else Vector.zero
+        starting_area(area,offset+V(-30,0),ps[::2],0)
+        starting_area(area,offset+V(30,0),ps[1::2],1)
         for n,p in enumerate(ps):
             p.team=n%2
 class Coop(Gamemode):
     def setup(self,area,ps):
-        starting_area(area,V(0,0),ps,None)
+        offset=area.bounds // 2 if area.bounds else Vector.zero
+        starting_area(area,offset,ps,None)
 gamemodes=[Standard(),Coop()]

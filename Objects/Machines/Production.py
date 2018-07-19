@@ -29,6 +29,6 @@ class Miner(Machine):
             Img.draw_rotor(surf,V(*tpos)+V(32,48),24,3,self.a,(80,80,80))
         super().render(layer,surf,tpos,area,scale)
 
-Registry.add_recipe({"Iron":10,"Gear":3},Items.Placeable(Miner))
+Registry.add_recipe({"Iron":4,"Gear":2},Items.Placeable(Miner))
 
 

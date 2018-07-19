@@ -58,6 +58,8 @@ class VectorX(tuple):
         return math.atan2(self.y-other.y,other.x-self.x)
     def len_to(self,other):
         return sum((self[n]-other[n])**2 for n in range(len(self)))**0.5
+    def alt_len(self,other):
+        return max(abs(self[n]-other[n]) for n in range(len(self)))
     @property
     def rlen(self):
         return sum(x**2 for x in self)**0.5

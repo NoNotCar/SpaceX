@@ -104,6 +104,8 @@ class LaserTurret(Turret):
     ds=1
     turret=Img.lotsrots(Img.imgx("War/LaserTurret"),ds)
     fx=FX.Laser
+    def explode(self,area,pos,tier):
+        return False
 class GunTurret(Turret):
     fx =FX.Gunfire
     reload=0
@@ -125,6 +127,7 @@ class GunTurret(Turret):
         self.reload=10
         return super().shoot(area,target)
 add_recipesearch({"Iron":3,"Circuit":1,"Bomb":1},Placeable(Mine),[1],30)
-add_recipesearch({"Steel":4,"Ammo":2,"Gear":5},Placeable(GunTurret),[1],10)
-add_recipesearch({"Bomb":1,"Copper":2},resources["Ammo"],[1],5)
+add_recipesearch({"Iron":4,"Gear":2},Placeable(GunTurret),[1],10)
+add_recipesearch({"Coal":1,"Copper":2},resources["Ammo"],[1],5)
 add_recipe({"Iron":2,"Coal":2},Placeable(Bomb))
+add_recipesearch({"Steel":8,"Circuit":20},Placeable(LaserTurret),[1,2],50)

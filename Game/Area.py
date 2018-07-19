@@ -9,6 +9,7 @@ exp=Img.sndget("bomb")
 class Area(object):
     backcol=(0,0,0)
     infinite=False
+    large=False
     explored=()
     building=None
     anitick=0
@@ -23,7 +24,7 @@ class Area(object):
         self.targets=set()
         self.gen=generator
         self.building=building
-        if not self.infinite:
+        if not self.large:
             generator.generate(self)
     def spawn(self,nobj,pos):
         for l in nobj.layers:
@@ -195,13 +196,35 @@ class Area(object):
         self.ebuffer-=prov
         return prov
     def generate(self,gfunc):
-        if self.infinite:
+        if self.large:
             return 0
         self.ebuffer+=gfunc(self.emax-self.ebuffer)
     def __getitem__(self, item):
         return self.ldict[item]
+class LargeArea(Area):
+    large = True
+    def __init__(self,bounds,generator):
+        super().__init__(bounds,generator,None)
+        self.explored=set()
+    def render(self,surf,player,pos):
+        sr=surf.get_rect()
+        start, size = pos - V(sr.w // 128 + 1, sr.h // 128 + 2), V(sr.w // 64 + 2, sr.h // 64 + 3)
+        poss=list(size.iter_space_2d(start))
+        for v in poss:
+            self.ping(v)
+        for l in self.layers:
+            l.render(surf,poss,start,-player.moveoff-V(64,128),self,player)
+    def ping(self,pos):
+        if pos not in self.explored:
+            if pos.within(self.bounds):
+                self.gen.gen_pos(self,pos)
+            self.explored.add(pos)
+    def get(self,layer,pos):
+        self.ping(pos)
+        return self.ldict[layer][pos]
 class InfiniteArea(Area):
     infinite = True
+    large = True
     def __init__(self,generator):
         super().__init__(None,generator,None)
         self.explored=set()

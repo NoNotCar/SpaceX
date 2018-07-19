@@ -71,7 +71,7 @@ class TileLayer(Layer):
         torender = sorted(set(t for t in surround if Tiles.tileorder[t.name] <= Tiles.tileorder[surround[0].name]))
         comp=[(torender[0],(4,4,4,4))]
         for t in torender[1:]:
-            uts = Vector.get_uts(pos, self, lambda ot: Tiles.tileorder[ot.name] >= Tiles.tileorder[t.name])
+            uts = Vector.get_uts(pos, self, lambda ot: ot is None or Tiles.tileorder[ot.name] >= Tiles.tileorder[t.name])
             if uts != (0, 0, 0, 0) or t == at:
                 comp.append((t,uts))
         comp=tuple(comp)

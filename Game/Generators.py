@@ -18,7 +18,7 @@ class OreGen(Generator):
     def gen_pos(self,area,pos):
         n=self.noise.get(pos)
         if n>1-self.density:
-            area.spawn_new(self.ore,pos,int((n-(1-self.density))/(1-self.density)*self.richness))
+            area.spawn_new(self.ore,pos,"INF" if not randint(0,9) else int((n-(1-self.density))/(1-self.density)*self.richness))
 oregens={Ores.IronOre:(0.35,1000),Ores.Stone:(0.3,500),Ores.Coal:(0.3,1000,20),Ores.CopperOre:(0.3,1000,28)}
 class Building(Generator):
     def gen_pos(self,area,pos):
@@ -45,10 +45,10 @@ class Earth(SurfaceGen):
         super().__init__()
         self.height=HarmonicPerlin(3,32)
     def gen_pos(self,area,pos):
-        h=self.height.get(pos)
+        h=self.height.get(pos)-(pos.alt_len(area.bounds//2)/(area.bounds.x//2))**5
         if h<0:
             area.set_tile("Water",pos)
-        elif h<0.2:
+        elif h<0.07:
             area.set_tile("Sand",pos)
         else:
             area.set_tile("Grass",pos)
@@ -57,5 +57,5 @@ class Earth(SurfaceGen):
                 o.gen_pos(area,pos)
             if not randint(0,500):
                 area.spawn_new(Special.ChaosCrystal,pos)
-            elif h>0.2 and randint(0,1):
+            elif h>0.1 and randint(0,1):
                 area.spawn_new(World.Tree,pos)

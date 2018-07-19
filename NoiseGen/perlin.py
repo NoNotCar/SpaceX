@@ -382,4 +382,4 @@ class HarmonicPerlin(object):
         self.factor=factor
         self.octaves=octaves
     def get(self,pos):
-        return sum(n.get(pos)*(self.factor**x) for x,n in enumerate(self.noises))*sum(self.factor**n for n in range(self.octaves))
+        return sum(n.get(pos)*(self.factor**x) for x,n in enumerate(self.noises))/sum(self.factor**n for n in range(self.octaves))
