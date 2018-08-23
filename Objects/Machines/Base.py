@@ -38,7 +38,16 @@ class FixedMachine(Machine):
     rotates = False
     def __init__(self,coords,p):
         super().__init__(coords,0,p)
-class SlotMachine(Machine):
+class OutputMachine(Machine):
+    arrows = Img.imgrot("Machines/OutputOnly")
+    def render(self, layer, surf, tpos, area, scale=3):
+        super().render(layer, surf, tpos, area, scale)
+        if layer == self.renderlayer:
+            surf.blit(self.arrows[self.r][scale], tpos)
+    @property
+    def img(self):
+        return self.imgs[self.r==2]
+class SlotMachine(OutputMachine):
     outputslot=None
     output_enabled=False
     arrows=Img.imgrot("Machines/StandardIO")
@@ -50,7 +59,3 @@ class SlotMachine(Machine):
         elif area.get("Conv",pos+Vector.vdirs[self.r]):
             self.output_enabled=True
         super().update(pos,area,events)
-    def render(self, layer, surf, tpos, area,scale=3):
-        super().render(layer,surf,tpos,area,scale)
-        if layer==self.renderlayer:
-            surf.blit(self.arrows[self.r][scale],tpos)

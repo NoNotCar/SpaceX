@@ -1,5 +1,5 @@
 from Lib.Vector import VectorX as V
-from Objects import Overlays,Special,World
+from Objects import Overlays,Special,World,Agriculture
 from NoiseGen.perlin import UltraPerlin,HarmonicPerlin
 from random import randint,uniform
 from Engine import Ores
@@ -18,7 +18,7 @@ class OreGen(Generator):
     def gen_pos(self,area,pos):
         n=self.noise.get(pos)
         if n>1-self.density:
-            area.spawn_new(self.ore,pos,"INF" if not randint(0,19) else int((n-(1-self.density))/(1-self.density)*self.richness))
+            area.spawn_new(self.ore,pos,"INF" if not randint(0,29) else int((n-(1-self.density))/(1-self.density)*self.richness))
 oregens={Ores.IronOre:(0.35,1000),Ores.Stone:(0.3,500),Ores.Coal:(0.3,1000,20),Ores.CopperOre:(0.3,1000,28)}
 class Building(Generator):
     def gen_pos(self,area,pos):
@@ -55,7 +55,9 @@ class Earth(SurfaceGen):
         if h>0:
             for o in self.oregens:
                 o.gen_pos(area,pos)
-            if not randint(0,500):
+            if not randint(0,200):
                 area.spawn_new(Special.ChaosCrystal,pos)
             elif h>0.1 and randint(0,1):
                 area.spawn_new(World.Tree,pos)
+            elif not randint(0,50):
+                area.spawn_new(Agriculture.FireFlower,pos)

@@ -39,8 +39,9 @@ class Area(object):
         else:
             nobj.coords=Vector.Coordinate(self,pos)
         nobj.on_spawn(self,pos)
+        return nobj
     def spawn_new(self,oc,pos,*args):
-        self.spawn(oc(Vector.Coordinate(self,pos),*args),pos)
+        return self.spawn(oc(Vector.Coordinate(self,pos),*args),pos)
     def spawn_item(self,item,pos):
         self.spawn_new(Items.ItemObject,pos,item)
     def set_tile(self,tile,pos):
@@ -162,7 +163,7 @@ class Area(object):
             for dpos in Vector.vdirs:
                 pos = fpos + dpos
                 for n in range(r):
-                    if not self.explode(pos, expeffect):
+                    if not self.explode(pos,exptier, expeffect):
                         break
                     pos += dpos
         elif exps == "Square":

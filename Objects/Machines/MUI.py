@@ -326,6 +326,7 @@ class Lab(Element):
     pcol=(200,200,255)
     backcol=(0,0,0)
     overlay=Img.imgx("SCIENCE")
+    done=Img.sndget("research")
     def __init__(self,energy,power,team):
         self.inputs=Items.MultiSlot([Items.FilterSlot(Items.resources["SP%s" % n]) for n in range(1,7)])
         self.energy=energy
@@ -341,7 +342,7 @@ class Lab(Element):
             if rcpos is not None and n==rcpos.x:
                 screen.blit(sel[3], (n*64,y))
         if Research.current_research[self.team]:
-            screen.blit(Research.current_research[self.team].img[3],((n+1)*64,y))
+            Img.draw_with_num(screen,Research.current_research[self.team].img,Research.rprogs[self.team],((n+1)*64,y),4)
         draw.rect(screen, self.backcol, Rect(0, y + 64, len(self.inputs.slots)*64, 32))
         if self.progress:
             draw.rect(screen, self.pcol, Rect(0, y + 64, len(self.inputs.slots)*64*self.progress/self.energy, 32))
@@ -358,6 +359,7 @@ class Lab(Element):
                     Research.rprogs[self.team]+=1
                     if Research.rprogs[self.team]==cr.n:
                         Research.on_complete(self.team)
+                        self.done.play()
                     self.progress=0
                 else:
                     self.progress+=ui.get_power(min(self.power,self.energy-self.progress))

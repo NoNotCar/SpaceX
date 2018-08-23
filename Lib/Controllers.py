@@ -30,6 +30,8 @@ class Controller(object):
         pass
     def get_start_select(self,events):
         return False,False
+    def get_pick(self):
+        return False
 class TandemController(Controller):
     cnum=0
     tandem = True
@@ -119,6 +121,8 @@ class Keyboard1(Controller):
                 elif e.key==pygame.K_t:
                     return False,True
         return False,False
+    def get_pick(self):
+        return pygame.key.get_pressed()[pygame.K_RCTRL]
 class UniJoyController(Controller):
     icon=1
     def __init__(self,n):
@@ -176,6 +180,9 @@ class UniJoyController(Controller):
         return Vector.zero
     def get_pressed(self):
         return (self.uj.get_b("A"),self.uj.get_b("B"))
+    def get_pick(self):
+        #me too d2
+        return self.uj.get_b("R2")
     def get_start_select(self,events):
         for e in events:
             if e.type==pygame.JOYBUTTONDOWN and e.joy==self.uj.jnum:

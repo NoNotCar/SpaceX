@@ -23,7 +23,6 @@ class Gamemode(object):
     def setup(self,area,ps):
         pass
     def starting_inv(self,inv):
-        inv.add(Tools.Pickaxe())
         inv.add(Items.Placeable(Basic.Furnace))
         inv.add(Items.Placeable(Production.Miner))
         inv.add(Items.Placeable(Vehicles.Boat))

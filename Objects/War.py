@@ -44,6 +44,19 @@ class Bomb(Object):
     @property
     def img(self):
         return self.imgs[4-self.t//20]
+class Fireball(Rotatable):
+    layers = ["Objects"]
+    imgs=Img.imgrot("War/Fireball")
+    rng=4
+    mspeed = 8
+    def update(self, pos, area, events):
+        if self.mprog:
+            return
+        if self.rng and area.move(self,pos,Vector.vdirs[self.r]):
+            self.rng-=1
+        else:
+            area.dobj(self,pos)
+            area.create_exp(pos,1,"Cross",0)
 def ang_d(a1,a2):
     return min(a1-a2,a1-a2-math.tau,key=abs)
 class Turret(Machine):
@@ -95,7 +108,7 @@ class Turret(Machine):
     def on_shoot(self,area,pos,power):
         self.hp-=power
         if self.hp<=0:
-            self.explode(area,pos,1)
+            self.explode(area,pos,2)
     @property
     def team(self):
         return self.p.team
@@ -105,7 +118,8 @@ class LaserTurret(Turret):
     turret=Img.lotsrots(Img.imgx("War/LaserTurret"),ds)
     fx=FX.Laser
     def explode(self,area,pos,tier):
-        return False
+        if tier>=2:
+            super().explode(area,pos,tier)
 class GunTurret(Turret):
     fx =FX.Gunfire
     reload=0
@@ -130,4 +144,3 @@ add_recipesearch({"Iron":3,"Circuit":1,"Bomb":1},Placeable(Mine),[1],30)
 add_recipesearch({"Iron":4,"Gear":2},Placeable(GunTurret),[1],10)
 add_recipesearch({"Coal":1,"Copper":2},resources["Ammo"],[1],5)
 add_recipe({"Iron":2,"Coal":2},Placeable(Bomb))
-add_recipesearch({"Steel":8,"Circuit":20},Placeable(LaserTurret),[1,2],50)

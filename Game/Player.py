@@ -22,6 +22,7 @@ class Player(Object):
         self.col=j.col
         self.j=j
         self.inv=Items.MultiSlot([Items.Slot() for _ in range(7)])
+        self.pick=Tools.Pickaxe()
     def update(self, pos, area, events):
         self.ss+=self.j.get_lr(events)
         self.ss%=7
@@ -55,7 +56,9 @@ class Player(Object):
         if not self.mprog:
             tpos = pos + Vector.vdirs[self.d]
             cslot=self.inv.slots[self.ss]
-            if cslot.q and (buttons[0] or (cslot.item.continuous and pressed[0])):
+            if self.j.get_pick():
+                self.pick.use(area,pos+Vector.vdirs[self.d],self.tr,self)
+            elif cslot.q and (buttons[0] or (cslot.item.continuous and pressed[0])):
                 if cslot.item.use(area,pos+Vector.vdirs[self.d],self.tr,self):
                     cslot.remove(1)
             if buttons[1]:
@@ -78,7 +81,6 @@ class Player(Object):
         return True
     def respawn(self):
         self.inv = Items.MultiSlot([Items.Slot() for _ in range(7)])
-        self.inv.add(Tools.Pickaxe())
         self.spawn.respawn(self)
         self.hp=1
     def enter_gui(self,gui):

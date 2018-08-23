@@ -73,7 +73,7 @@ class Storage(FixedMachine):
     def input(self,d,i):
         return self.inv.add(i)
 class Buffer(Machine):
-    imgs=[Img.imgx("Transport/Buffer")]
+    imgs=Img.imgstripxf("Transport/Buffer")
     def __init__(self,c,r,p):
         super().__init__(c,r,p)
         self.inv=MultiSlot([Slot() for _ in range(7)])
@@ -88,6 +88,8 @@ class Buffer(Machine):
                 if s.q:
                     if self.add_output(s.item):
                         s.remove(1)
+                        break
+        super().update(pos,area,events)
 class ChaosChest(FixedMachine):
     imgs=[Img.imgx("Transport/ChaosChest")]
     def __init__(self,c,p):

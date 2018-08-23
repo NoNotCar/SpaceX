@@ -21,25 +21,26 @@ class Furnace(SlotMachine):
     def img(self):
         return self.imgs[bool(self.processor.progress)]
 class AutoCrafter(SlotMachine):
-    imgs=Img.imgstripxf("Machines/AutoCrafter",16)
+    imgs=Img.imgstripxf("Machines/AutoCrafter")
     processor=None
+    rtype="Crafting"
     def __init__(self,c,r,p):
         super().__init__(c,r,p)
         self.electro=MUI.ElectroSlot(self)
-        self.gui=MUI.MUI("Select Recipe", [MUI.RSelect(get_recipes(self.p.team,"Crafting"))])
+        self.gui=MUI.MUI("Select Recipe", [MUI.RSelect(get_recipes(self.p.team,self.rtype))])
     def gui_trigger(self,*args):
         if args[0]=="Change Recipe" and not (self.processor and any(self.processor.inputs.slots)):
-            self.gui.re_init("Select Recipe", [MUI.RSelect(get_recipes(self.p.team,"Crafting"))])
+            self.gui.re_init("Select Recipe", [MUI.RSelect(get_recipes(self.p.team,self.rtype))])
             self.processor = None
         else:
             self.processor=MUI.Crafter(args,sum(q for q in args[0].values())*10,10)
             self.outputslot=self.processor.output
-            self.gui.re_init("AutoCrafter",[self.processor,self.electro,MUI.Button("Change Recipe")])
+            self.gui.re_init("AutoCrafter",[self.processor,self.electro,MUI.Button(self.rtype)])
     def input(self,d,i):
         return self.processor and self.processor.inputs.add(i,1)
     def re_own(self,p):
         self.p=p
-        self.gui = MUI.MUI("Select Recipe", [MUI.RSelect(get_recipes(self.p.team, "Crafting"))])
+        self.gui = MUI.MUI("Select Recipe", [MUI.RSelect(get_recipes(self.p.team, self.rtype))])
     @property
     def img(self):
         return self.imgs[bool(self.processor and self.processor.progress)]

@@ -1,9 +1,9 @@
 from collections import defaultdict,Counter
 recipes={}
 default_recipes=defaultdict(list)
-def add_recipe(inputs,output,type="Crafting",team=None):
+def add_recipe(inputs,output,type="Crafting",team="Base"):
     #FORMAT: dict str:int inputs, (item,quantity) or item output
-    rlist=default_recipes[type] if team is None else get_recipes(team,type)
+    rlist=default_recipes[type] if team is "Base" else get_recipes(team,type)
     if isinstance(output,tuple):
         rlist.append((inputs, output))
     else:

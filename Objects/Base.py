@@ -52,7 +52,7 @@ class Object(object):
         else:
             area.dobj(self,pos)
     def explode(self,area,pos,tier):
-        if self.hardness:
+        if self.hardness and tier:
             area.dobj(self,pos)
             return True
     def on_spawn(self,area,pos):

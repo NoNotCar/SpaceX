@@ -8,7 +8,7 @@ from . import Vector
 VX=Vector.VectorX
 joystick.init()
 buconv = {"XBOX": {"A": 0, "B": 1, "X": 2, "Y": 3, "L1": 4, "R1": 5, "SELECT": 6, "START": 7},
-          "PS2": {"A": 2, "B": 1,"X":3,"Y":0, "L1": 6,"R1":7,"START":9,"SELECT":8},
+          "PS2": {"A": 2, "B": 1,"X":3,"Y":0, "L1": 6,"R1":7,"R2":5,"START":9,"SELECT":8},
           "CHEAP": {"A": 2, "B": 3, "L1": 4,"R1":6}}
 
 js={}

@@ -235,8 +235,9 @@ class Viewport(Surface):
         # if self.size.x>7:
         #     pygame.draw.polygon(self.img,self.player.inv.slots[0].backcol,(V(448,0),V(512,0),V(448,63)))
         self.img.blit(self.rwidge[self.player.tr][3],(0,self.size.y*64-16))
-        if selitem and selitem.prog and self.player.j.get_pressed()[0]:
-            pygame.draw.rect(self.img,self.player.col,Rect(0,self.size.y*64-16,self.size.x*64*selitem.prog/selitem.prog_max,16))
+        pp=self.player.pick.prog
+        if pp and self.player.j.get_pick():
+            pygame.draw.rect(self.img,self.player.col,Rect(0,self.size.y*64-16,self.size.x*64*pp/self.player.pick.prog_max,16))
         hp=self.player.vehicle.hp if self.player.vehicle else self.player.hp
         if hp!=1:
             pygame.draw.rect(self.img, (255,0,0),Rect(0, self.size.y * 64, self.size.x * 64 * hp, 16))

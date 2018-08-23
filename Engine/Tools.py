@@ -1,7 +1,8 @@
 from .Items import Item
 from Lib import Img
 import pygame
-from Game import Registry,Research,Boxes
+from Game import Registry,Research
+from Objects import War
 error=Img.sndget("error")
 bsnd=Img.sndget("break")
 class Pickaxe(Item):
@@ -21,7 +22,7 @@ class Pickaxe(Item):
                     if self.prog==o.hardness:
                         item=o.mined()
                         o.on_mine(area,tpos)
-                        if p.inv.add(item,1):
+                        if item is None or p.inv.add(item,1):
                             bsnd.play()
                         elif area.clear("Items",tpos):
                             area.spawn_item(item,tpos)
@@ -53,6 +54,14 @@ class ChainSaw(Item):
         tree=area.get("Objects",tpos)
         if tree and tree.name=="Tree" and p.inv.add(tree.mined()):
             area.dobj(tree,tpos)
+class FireFlower(Item):
+    img=Img.imgstripx("Plants/FireFlower")[-1]
+    def use(self,area,tpos,tr,p):
+        if area.clear("Objects",tpos):
+            area.spawn_new(War.Fireball,tpos,p.d)
+            return True
+        return False
+from Game import Boxes
 class EntangledPlacer(Item):
     imgs=Img.imgstripx("Tools/EntangledPlacer")
     img=imgs[0]
