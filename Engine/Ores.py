@@ -16,12 +16,12 @@ class Ore(Base.Object):
     imgs=[]
     updates = False
     hardness = 120
-    def __init__(self,coords,q):
+    def __init__(self,coords,q,aq):
         super().__init__(coords)
         self.inf=q=="INF"
         self.q=q if self.inf else q+1
         self.r=randint(0,3)
-        self.i=len(self.imgs)-1 if self.inf else max(0,min(int(log(self.q,7)-1),len(self.imgs)-2))
+        self.i=len(self.imgs)-1 if self.inf else max(0,min(int(log(aq,7)-1),len(self.imgs)-2))
     @property
     def img(self):
         return self.imgs[self.i][self.r]
@@ -43,6 +43,12 @@ class Coal(Ore):
     imgs=ore_strip("Ores/Coal")
 class CopperOre(Ore):
     imgs=ore_strip("Ores/CopperOre")
+class ChaosOre(Ore):
+    imgs=ore_strip("Ores/ChaosOre")
+    def mined(self):
+        return Items.resources["ChaosCrystal"]
 Registry.add_process_recipe("Smelting",("IronOre",1),(Items.resources["Iron"],1),50)
+Registry.add_process_recipe("Electrolyser",("IronOre",1),(Items.resources["Iron"],2),150)
 Registry.add_process_recipe("Smelting",("CopperOre",1),(Items.resources["Copper"],1),50)
+Registry.add_process_recipe("Electrolyser",("CopperOre",1),(Items.resources["Copper"],2),150)
 Registry.add_process_recipe("Smelting",("Stone",2),(Items.resources["Brick"],1),100)

@@ -2,11 +2,12 @@ from Lib import Img,Vector
 from .Base import Machine,SlotMachine,FixedMachine
 from Engine.Items import Placeable,fuels
 from Game.Registry import add_recipe,get_recipes
-from Game import Research
+from Game.Research import add_recipesearch
 from . import MUI
 V=Vector.VectorX
 class Furnace(SlotMachine):
     imgs=Img.imgstripxf("Machines/Furnace",16)
+    working=False
     def __init__(self,c,r,p):
         super().__init__(c,r,p)
         self.processor=MUI.Processor("Smelting",10)
@@ -17,9 +18,23 @@ class Furnace(SlotMachine):
         if i.name in fuels:
             return self.fuel.slot.add(i,1)
         return self.processor.input.add(i,1)
+    def update(self, pos, area, events):
+        lp=self.processor.progress
+        super().update(pos,area,events)
+        self.working=self.processor.progress!=lp
     @property
     def img(self):
-        return self.imgs[bool(self.processor.progress)]
+        return self.imgs[self.working]
+class Electrolyser(Furnace):
+    imgs=Img.imgstripxf("Machines/Electrolyser")
+    def __init__(self,c,r,p):
+        SlotMachine.__init__(self,c,r,p)
+        self.processor=MUI.Processor("Electrolyser",20)
+        self.fuel=MUI.ElectroSlot(self)
+        self.gui=MUI.MUI("Electrolyser",[self.processor,self.fuel])
+        self.outputslot=self.processor.output
+    def input(self,d,i):
+        return self.processor.input.add(i)
 class AutoCrafter(SlotMachine):
     imgs=Img.imgstripxf("Machines/AutoCrafter")
     processor=None
@@ -81,3 +96,4 @@ add_recipe({"Stone":5},Placeable(Furnace))
 add_recipe({"Iron":10,"Circuit":3},Placeable(AutoCrafter))
 add_recipe({"Furnace":1,"Wire":8},Placeable(Generator))
 add_recipe({"AutoCrafter":1,"SP1":5},Placeable(Lab))
+add_recipesearch({"Furnace":1,"Circuit":5},Placeable(Electrolyser),[1],30)

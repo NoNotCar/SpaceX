@@ -71,6 +71,7 @@ class Turret(Machine):
     hp=1
     fx=FX.Gunfire
     damage=0.01
+    rng=4
     def render(self, layer, surf, tpos, area,scale=3):
         super().render(layer,surf,tpos,area,scale)
         if layer==self.renderlayer:
@@ -87,7 +88,7 @@ class Turret(Machine):
         for t in area.targets:
             length=pos.len_to(t.coords.pos)
             if t.team is not None and t.team!=self.p.team:
-                if length<=4:
+                if length<=self.rng:
                     apos=t.coords.pos+t.moveoff/64
                     tar_ang=pos.angle_to(apos)%math.tau
                     d=ang_d(self.angle,tar_ang)
@@ -104,7 +105,7 @@ class Turret(Machine):
                 else:
                     ls.append(length)
         else:
-            self.sleep=60 if not ls else min(ls)*10
+            self.sleep=60 if not ls else min(ls)*5
     def on_shoot(self,area,pos,power):
         self.hp-=power
         if self.hp<=0:
@@ -124,6 +125,7 @@ class GunTurret(Turret):
     fx =FX.Gunfire
     reload=0
     damage = 0.105
+    fire_rate=10
     def __init__(self,c,r,p):
         super().__init__(c,r,p)
         self.ammo=MUI.ConsumableSlot(ammos,(50,100,50))
@@ -138,9 +140,15 @@ class GunTurret(Turret):
     def shoot(self,area,target):
         if self.reload or not self.ammo.get(1):
             return False
-        self.reload=10
+        self.reload=self.fire_rate
         return super().shoot(area,target)
+class GunTurret2(GunTurret):
+    rspeed = 0.12
+    fire_rate = 4
+    turret = Img.lotsrots(Img.imgx("War/GunTurret2"), 1)
+    rng = 8
 add_recipesearch({"Iron":3,"Circuit":1,"Bomb":1},Placeable(Mine),[1],30)
 add_recipesearch({"Iron":4,"Gear":2},Placeable(GunTurret),[1],10)
+add_recipesearch({"Steel":4,"Circuit":5},Placeable(GunTurret2),[1,2],50)
 add_recipesearch({"Coal":1,"Copper":2},resources["Ammo"],[1],5)
 add_recipe({"Iron":2,"Coal":2},Placeable(Bomb))

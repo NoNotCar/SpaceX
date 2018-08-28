@@ -20,24 +20,29 @@ def starting_area(area,pos,ps,team):
             area.spawn_new(War.LaserTurret,pos+v*2,0,ps[0])
 
 class Gamemode(object):
-    def setup(self,area,ps):
+    def setup(self,planet,ps):
         pass
     def starting_inv(self,inv):
         inv.add(Items.Placeable(Basic.Furnace))
         inv.add(Items.Placeable(Production.Miner))
         inv.add(Items.Placeable(Vehicles.Boat))
+        inv.add(Items.Placeable(Boxes.StdBox))
+        inv.add(Items.Placeable(Basic.Generator))
+        inv.add(Items.Placeable(Basic.Electrolyser))
     @property
     def name(self):
         return self.__class__.__name__
 class Standard(Gamemode):
-    def setup(self,area,ps):
-        offset=area.bounds//2 if area.bounds else Vector.zero
-        starting_area(area,offset+V(-30,0),ps[::2],0)
-        starting_area(area,offset+V(30,0),ps[1::2],1)
+    def setup(self,planet,ps):
+        for n in range(2):
+            area=planet[V(n,0)]
+            offset=area.bounds//2 if area.bounds else Vector.zero
+            starting_area(area,offset,ps[n::2],n)
         for n,p in enumerate(ps):
             p.team=n%2
 class Coop(Gamemode):
-    def setup(self,area,ps):
+    def setup(self,planet,ps):
+        area=planet[Vector.zero]
         offset=area.bounds // 2 if area.bounds else Vector.zero
         starting_area(area,offset,ps,None)
 gamemodes=[Standard(),Coop()]

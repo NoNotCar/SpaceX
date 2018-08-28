@@ -38,6 +38,8 @@ class Object(object):
         pass
     def interact(self,player,ppos,pos,area):
         pass
+    def wrench(self,player,ppos,pos,area):
+        pass
     def out_warp(self,iarea,pos,d):
         return False
     def in_warp(self,d):

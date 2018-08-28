@@ -17,6 +17,6 @@ class Tile(Object):
         return tuts[self.override_name]
 class Liquid(Tile):
     support = False
-tiles=[Liquid("Water"),Tile("Sand"),Tile("Grass"),Tile("MetalFloor"),Tile("Bridge")]
+tiles=[Liquid("Water"),Tile("Sand"),Tile("Grass"),Tile("Ice"),Tile("MetalFloor"),Tile("Bridge")]
 tileorder={t.name:n for n,t in enumerate(tiles)}
 tdict={t.name:t for t in tiles}

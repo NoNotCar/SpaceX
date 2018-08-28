@@ -61,6 +61,12 @@ class FireFlower(Item):
             area.spawn_new(War.Fireball,tpos,p.d)
             return True
         return False
+class Wrench(Item):
+    img=Img.imgx("Tools/Wrench")
+    def use(self,area,tpos,tr,p):
+        o=area.get("Objects",tpos)
+        if o:
+            o.wrench(p,p.coords.pos,tpos,area)
 from Game import Boxes
 class EntangledPlacer(Item):
     imgs=Img.imgstripx("Tools/EntangledPlacer")
@@ -83,6 +89,7 @@ class EntangledPlacer(Item):
             self.phase=1
             self.img=self.imgs[1]
 Registry.add_recipe({"Iron":3,"Brick":5},Bridger())
+Registry.add_recipe({"Iron":3},Wrench())
 Research.add_recipesearch({"Circuit":5,"Steel":3},ChainSaw(),[1],20)
 Research.add_recipesearch({"StdBox":1,"ChaosCrystal":3},EntangledPlacer(),[1],50)
 

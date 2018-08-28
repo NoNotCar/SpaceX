@@ -386,6 +386,24 @@ class Button(Element):
         if self.triggered:
             machine.gui_trigger(self.text)
             self.triggered=False
+class SelList(Element):
+    selcol=(255,0,0)
+    selected=None
+    def __init__(self,l):
+        self.sels=l
+    def inside(self,rpos,w):
+        return rpos.x==0 and rpos.y<len(self.sels)
+    def get_h(self,w):
+        return len(self.sels)
+    def render(self,screen,y,size,rcpos=None):
+        for n,s in enumerate(self.sels):
+            Img.bcentrex(tfont,s,screen,n*64+y-16,col=(0,0,0) if rcpos is None or rcpos.y!=n else self.selcol)
+    def on_a(self,rpos,w,p):
+        self.selected=rpos.y
+    def machine_update(self,ui,machine):
+        if self.selected is not None:
+            machine.gui_trigger(self.selected)
+            self.selected=None
 class Inventory(Element):
     def __init__(self,mslot):
         self.inv=mslot

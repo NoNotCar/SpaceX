@@ -28,6 +28,8 @@ class VectorX(tuple):
         return any(self)
     def __abs__(self):
         return VectorX(*(abs(x) for x in self))
+    def __mod__(self, other):
+        return VectorX(*(x % other for x in self))
     def unit(self):
         try:
             return self/self.rlen

@@ -1,7 +1,7 @@
 from .Base import Object
 from Lib import Img,Vector
 from random import randint
-from Engine import Tools
+from Engine import Tools,Items
 V=Vector.VectorX
 class Crop(Object):
     imgs=[]
@@ -36,4 +36,8 @@ class Crop(Object):
 class FireFlower(Crop):
     imgs = Img.imgstripxf("Plants/FireFlower")
     item=Tools.FireFlower()
+class Tree(Crop):
+    imgs=Img.imgstripxf("World/Tree")
+    item = Items.resources["Log"]
+crops=[FireFlower,Tree]
 

@@ -17,7 +17,7 @@ class Area(object):
     emax=10
     def __init__(self,bounds,generator,building):
         self.bounds=bounds
-        self.layers=[TileLayer(16,"Tiles"),Layer(16,"Ore"),Layer(16,"Overlay"),Layer(16,"Conv"),Layer(16,"Items"),Layer(0,"Objects"),FXLayer("FX")]
+        self.layers=[TileLayer(16,"Tiles"),Layer(16,"Ore"),Layer(16,"Overlay"),Layer(16,"Conv"),Layer(16,"Items"),Layer(0,"Objects"),Layer(-32,"Air"),FXLayer("FX")]
         self.ldict = {l.name: l for l in self.layers}
         self.ups=set()
         self.mups=set()
@@ -62,16 +62,17 @@ class Area(object):
         for l in self.layers:
             if l!="Tiles":
                 self.dest(l.name,pos)
-    def move(self,obj,pos,d,warped=False,override_speed=None,tpos_cache=None):
+    def move(self,obj,pos,d,warped=False,override_speed=None,tpos_cache=None,re_layer=None):
         tpos = tpos_cache or pos + d
+        tlayers=re_layer or obj.layers
         if not self.infinite and not tpos.within(self.bounds):
-            if self.building:
+            if self.building and (not self.large or "Air" in obj.layers):
                 warp=self.building.out_warp(self,pos,d)
                 if warp:
                     return self.warp(warp, obj, pos, d,warped,override_speed)
             return False
         blocked=False
-        for l in obj.layers:
+        for l in tlayers:
             o=self.get(l, tpos)
             if o:
                 blocked=True
@@ -92,11 +93,15 @@ class Area(object):
             return False
         if not warped:
             self.dobj(obj,pos)
+        if re_layer:
+            obj.lmo=-d-V(0,(self.ldict[re_layer[0]].off-self.ldict[obj.layers[0]].off)/64)
+            obj.layers=re_layer
+        else:
+            obj.lmo = -d
         self.spawn(obj, tpos)
         if warped:
             for l in obj.layers:
                 self.ldict[l].outobjs[tpos] = obj
-        obj.lmo=-d
         obj.mprog=64
         obj.aspeed=override_speed or obj.mspeed
         return True
@@ -204,8 +209,8 @@ class Area(object):
         return self.ldict[item]
 class LargeArea(Area):
     large = True
-    def __init__(self,bounds,generator):
-        super().__init__(bounds,generator,None)
+    def __init__(self,bounds,generator,planet):
+        super().__init__(bounds,generator,planet)
         self.explored=set()
     def render(self,surf,player,pos):
         sr=surf.get_rect()

@@ -1,5 +1,6 @@
 from Lib import Img,Vector
 from .Base import Machine,OutputMachine
+from . import MUI
 from Engine import Items
 from Game import Registry,Research
 from pygame import Rect
@@ -33,8 +34,12 @@ class Miner(Machine):
         super().render(layer,surf,tpos,area,scale)
 class Farmer(OutputMachine):
     imgs=Img.imgstripxf("Machines/Farmer")
-    crop=Agriculture.FireFlower
-    def on_spawn(self,area,pos):
+    crops=None
+    crop=None
+    def __init__(self,c,r,p):
+        self.gui=MUI.MUI("Select Crop",[MUI.SelList([c.get_name() for c in Agriculture.crops])])
+        super().__init__(c,r,p)
+    def init_crops(self,area,pos):
         self.crops={}
         for tpos in V(5,5).iter_space_2d(pos-V(2,2)):
             pcrop=True
@@ -51,22 +56,28 @@ class Farmer(OutputMachine):
                 pcrop=False
             if tpos not in self.crops:
                 self.crops[tpos]=area.spawn_new(self.crop,tpos,self) if pcrop else None
+    def gui_trigger(self,*args):
+        self.crop=Agriculture.crops[args[0]]
     def update(self, pos, area, events):
-        if not randint(0,self.crop.gspeed//25):
-            tpos,ch=choice(list(self.crops.items()))
-            if ch:
-                if not ch.exists:
-                    self.crops[tpos]=None
-                elif ch.growth < ch.max_g:
-                    ch.growth += 1
-                elif self.add_output(ch.mined()):
-                    ch.growth=ch.harvest_state
+        if self.crops:
+            if not randint(0,self.crop.gspeed//25):
+                tpos,ch=choice(list(self.crops.items()))
+                if ch:
+                    if not ch.exists:
+                        self.crops[tpos]=None
+                    elif ch.growth < ch.max_g:
+                        ch.growth += 1
+                    elif self.add_output(ch.mined()):
+                        ch.growth=ch.harvest_state
+        elif self.crop:
+            self.init_crops(area,pos)
         super().update(pos,area,events)
     def on_dest(self,area,pos):
-        for tpos,crop in self.crops.items():
-            if crop:
-                crop.bound=None
-                area.ups.add((tpos,crop))
+        if self.crops:
+            for tpos,crop in self.crops.items():
+                if crop:
+                    crop.bound=None
+                    area.ups.add((tpos,crop))
 Registry.add_recipe({"Iron":4,"Gear":2},Items.Placeable(Miner))
 Research.add_recipesearch({"Copper":8,"Gear":4},Items.Placeable(Farmer),[1],20)
 

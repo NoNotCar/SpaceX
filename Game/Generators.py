@@ -18,8 +18,9 @@ class OreGen(Generator):
     def gen_pos(self,area,pos):
         n=self.noise.get(pos)
         if n>1-self.density:
-            area.spawn_new(self.ore,pos,"INF" if not randint(0,29) else int((n-(1-self.density))/(1-self.density)*self.richness))
-oregens={Ores.IronOre:(0.35,1000),Ores.Stone:(0.3,500),Ores.Coal:(0.3,1000,20),Ores.CopperOre:(0.3,1000,28)}
+            q="INF" if not randint(0,29) else int((n-(1-self.density))/(1-self.density)*self.richness)
+            area.spawn_new(self.ore,pos,q,q if q=="INF" else q*1000/self.richness+1)
+oregens={Ores.IronOre:(0.35,1000),Ores.Stone:(0.3,500),Ores.Coal:(0.3,1000,20),Ores.CopperOre:(0.3,1000,28),Ores.ChaosOre:(0.2,100)}
 class Building(Generator):
     def gen_pos(self,area,pos):
         area.set_tile("MetalFloor",pos)
@@ -39,7 +40,7 @@ class SurfaceGen(Generator):
         for o in self.oregens:
             o.gen_pos(area,pos)
         area.set_tile(self.surface, pos)
-class Earth(SurfaceGen):
+class Islands(SurfaceGen):
     ores = [Ores.IronOre,Ores.Stone,Ores.Coal,Ores.CopperOre]
     def __init__(self):
         super().__init__()
@@ -61,3 +62,16 @@ class Earth(SurfaceGen):
                 area.spawn_new(World.Tree,pos)
             elif not randint(0,50):
                 area.spawn_new(Agriculture.FireFlower,pos)
+class IceCap(SurfaceGen):
+    ores = [Ores.ChaosOre]
+    def __init__(self):
+        super().__init__()
+        self.height=HarmonicPerlin(3,32)
+    def gen_pos(self,area,pos):
+        h=self.height.get(pos)-(pos.alt_len(area.bounds//2)/(area.bounds.x//2))**5*2
+        if h<-1:
+            area.set_tile("Water",pos)
+        else:
+            area.set_tile("Ice",pos)
+            for o in self.oregens:
+                o.gen_pos(area,pos)
